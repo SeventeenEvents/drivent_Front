@@ -12,9 +12,8 @@ export default function Dashboard() {
   const { eventInfo } = useContext(EventInfoContext);
 
   return (
-    <DashboardLayout background={eventInfo.backgroundImageUrl}>
+    <DashboardLayout background={''/*eventInfo.backgroundImageUrl*/}>
       <NavigationBar />
-
       <Container>
         <Outlet />
       </Container>
