@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import { FaUserAlt } from 'react-icons/fa';
 
-export default function RoomCard({ room }) {
+export default function RoomCard({ room, selectedRoom, toggleRoom }) {
   //substituir 101 pelo id do quarto
   return (
-    <ContainerCard>
-      <RoomNumber>101</RoomNumber>
+    <ContainerCard selectedRoom={room.id === selectedRoom} onClick={() => toggleRoom(room.id)}>
+      <RoomNumber>{room.id}</RoomNumber>
       <div>
         <FaUserAlt />
         <FaUserAlt />
@@ -23,11 +23,12 @@ const ContainerCard = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 15px;
+  background: ${({ selectedRoom }) => (selectedRoom ? '#ffeed2' : '#ebebeb')};
 
-  div{
-    display:flex;
+  div {
+    display: flex;
     gap: 3px;
-    font-size:22px;
+    font-size: 22px;
   }
 `;
 

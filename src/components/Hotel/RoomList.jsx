@@ -1,13 +1,21 @@
 import styled from 'styled-components';
 import RoomCard from './RoomCard';
+import { useState } from 'react';
 
 export default function RoomList({ rooms }) {
+  const [selectedRoom, setSelectedRoom] = useState();
+
+  function toggleRoom(roomId) {
+    if (roomId === selectedRoom) setSelectedRoom(null);
+    if (roomId !== selectedRoom) setSelectedRoom(roomId);
+  }
+
   return (
     <>
       <Subtitle>Ótima pedida! Agora escolha seu quarto:</Subtitle>
       <ListContainer>
         {rooms.map((room) => {
-          return <RoomCard room={room}/>;
+          return <RoomCard room={room} selectedRoom={selectedRoom} toggleRoom={() => toggleRoom(room.id)} />;
         })}
       </ListContainer>
     </>
