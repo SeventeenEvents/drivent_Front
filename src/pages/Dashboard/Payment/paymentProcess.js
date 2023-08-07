@@ -3,6 +3,7 @@ import chipIcon from '../../../assets/images/sim-card.png';
 import { BsFillCircleFill } from 'react-icons/bs';
 import { FaCheckCircle } from 'react-icons/fa';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 export default function PaymentProcess() {
   const [pay, setPay] = useState(false);
   return (
@@ -18,7 +19,7 @@ export default function PaymentProcess() {
         </CardContainer>
       </CardToChoice>
 
-      <CardForm onSubmit={(e) => {e.preventDefault(); setPay(true);}}>
+      <CardForm onSubmit={(e) => {e.preventDefault(); setPay(true); toast('Pagamento Realizado');}}>
         <h3>Pagamento</h3>
         
         { !pay?
