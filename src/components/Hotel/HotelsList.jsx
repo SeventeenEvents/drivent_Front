@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import HotelCard from './HotelCard';
+import { useEffect } from 'react';
+import RoomList from './RoomList';
 
-export default function HotelsList() {
-  // const [hotels, setHotels] = useState();
+export default function HotelsList({ hotels }) {
   let hotelsData = [
     {
       id: 1,
@@ -154,7 +155,8 @@ export default function HotelsList() {
       ],
       createdAt: '2023-08-05T09:15:00Z',
       updatedAt: '2023-08-05T09:15:00Z',
-    },    {
+    },
+    {
       id: 1,
       name: 'Luxury Resort',
       image: 'luxury_resort.jpg',
@@ -305,22 +307,21 @@ export default function HotelsList() {
       updatedAt: '2023-08-05T09:15:00Z',
     },
   ];
+  const [selectedHotel, setSelectedHotel] = useState();
+
+  function toggleHotel(hotelId) {
+    if (hotelId === selectedHotel) setSelectedHotel(null);
+    if (hotelId !== selectedHotel) setSelectedHotel(hotelId);
+  }
 
   return (
     <>
       <ListContainer>
         {hotelsData.map((hotel) => {
-          return (
-            <HotelCard
-              key={hotel.id}
-              name={hotel.name}
-              image={hotel.image}
-              type={hotel.name}
-              availability={hotel.Rooms[0].capacity}
-            />
-          );
+          return <HotelCard hotel={hotel} selectedHotel={selectedHotel} toggleHotel={() => toggleHotel(hotel.id)} />;
         })}
       </ListContainer>
+      {selectedHotel ? <RoomList rooms={hotels[selectedHotel].Rooms} selectedHotel={selectedHotel} /> : ''}
     </>
   );
 }
