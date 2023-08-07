@@ -8,6 +8,12 @@ import { toast } from 'react-toastify';
 import useTicketTypes from '../../../hooks/api/useTicketTypes';
 import api from '../../../services/api'; // Importe o serviço de API, se não estiver importado.
 
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import api from '../../../services/api';
+import useToken from '../../../hooks/useToken';
+import TicketBox from '../../../components/Tickets/TicketBox';
+
 export default function Payment() {
   const token = useToken();
   const [types, setTypes] = useState([]);
