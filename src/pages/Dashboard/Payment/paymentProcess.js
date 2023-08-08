@@ -19,7 +19,7 @@ export default function PaymentProcess() {
         </CardContainer>
       </CardToChoice>
 
-      <CardForm onSubmit={(e) => {e.preventDefault(); setPay(true); toast('Pagamento Realizado');}}>
+      <CardForm onSubmit={(e) => {e.preventDefault(); setPay(true); toast.success('Pagamento Realizado');}}>
         <h3>Pagamento</h3>
         
         { !pay?
