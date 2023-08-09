@@ -34,9 +34,9 @@ export default function Hotel() {
   }, []);
 
   function verifyUserTicketStatus() {
-    if(ticketData.status === 'PAID' && ticketsType.isRemote === false) {
+    if(ticketData.status === 'PAID' && ticketsType[0].includesHotel === false) {
       return 'Listando hoteis ..';
-    } else if (ticketData.status === 'RESERVED' && ticketsType[0].isRemote === false)  {
+    } else if (ticketData.status === 'RESERVED' && ticketsType[0].includesHotel === false)  {
       return 'Pagamento pendente. Finalize o pagamento para poder acessar os hotéis disponíveis.';
     } else if (ticketData.length === 0) {
       return 'Ainda não há inscrição em nenhum evento.';
