@@ -1,53 +1,73 @@
+import styled from 'styled-components';
+import HotelsList from '../../../components/Hotel/HotelsList';
+import { useEffect, useState } from 'react';
+import useToken from '../../../hooks/useToken';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import UserContext from '../../../contexts/UserContext';
-import { useContext } from 'react';
 
 export default function Hotel() {
-  const { userData } = useContext(UserContext);
-  const { token } = userData;
-  const BASE_URL = process.env.REACT_APP_API_BASE_URL;
-  const [ticketData, setTicketData] = useState([]);
-  const [ticketsType, setTicketsType] = useState([]);
-  let ticketType;
+  const token = useToken();
+  const [hotels, setHotels] = useState([]);
+  const [includesHotel, setIncludesHotel] = useState(true);
+  const [ticketPaid, setTicketPaid] = useState(true);
+  console.log('entrou no index hotel');
 
-  const config = {
+  const headers = {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }; 
-  
-  useEffect(() => {
-    axios.get(`${BASE_URL}tickets`, config).then((response) => {
-      setTicketData(response.data);
-    }).catch((error) => {
-      console.log(error.message);
-    });
-  }, []);
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   useEffect(() => {
-    axios.get(`${BASE_URL}tickets/types`, config).then((response) => {
-      setTicketsType(response.data);
-    }).catch((error) => {
-      console.log(error.message);
-    });
-  }, []);
+    console.log('entrou no useEffect');
+    const hotelsList = axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}hotels`, headers)
+      .then((res) => {
+        setHotels(res.data);
+        console.log(hotels);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 402) setTicketPaid(false);
+        if (error.response && error.response.status === 404) setIncludesHotel(false);
+        console.log(error.message);
+      });
+    console.log(hotelsList);
+  }, [token]);
 
-  function verifyUserTicketStatus() {
-    if(ticketData.status === 'PAID' && ticketsType[0].includesHotel === true) {
-      return 'Listando hoteis ..';
-    } else if (ticketData.status === 'RESERVED' && ticketsType[0].includesHotel === false)  {
-      return 'Pagamento pendente. Finalize o pagamento para poder acessar os hotéis disponíveis.';
-    } else if (ticketData.length === 0) {
-      return 'Ainda não há inscrição em nenhum evento.';
-    } else if (ticketsType[0].isRemote === true) {
-      return 'Sua modalidade de inscrição não permite reserva de hotel.';
-    }
+  if (!ticketPaid) {
+    return (
+      <>
+        <Title>Escolha de quarto e hotel</Title>
+        <Subtitle>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</Subtitle>
+      </>
+    );
+  }
+  if (!includesHotel) {
+    return (
+      <>
+        <Title>Escolha de quarto e hotel</Title>
+        <Subtitle>Sua modalidade de ingresso não inclui hospedagem. Prossiga para a escolha de atividades</Subtitle>
+      </>
+    );
   }
 
   return (
     <>
-      {verifyUserTicketStatus()}
+      <Title>Escolha de quarto e hotel</Title>
+      <Subtitle>Primeiro, escolha seu hotel</Subtitle>
+      <HotelsList hotels={hotels} />
     </>
   );
 }
+
+const Subtitle = styled.h2`
+  color: #8e8e8e;
+  font-size: 20px;
+  line-height: 24px;
+  padding: 15px 0px;
+`;
+const Title = styled.h1`
+  color: #000;
+  font-family: Roboto;
+  font-size: 34px;
+  font-weight: 400;
+`;
