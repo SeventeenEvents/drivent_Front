@@ -3,7 +3,7 @@ import useToken from '../useToken';
 
 import * as ticketApi from '../../services/ticketApi';
 
-export default function useTickets() {
+export default function useTicketType() {
   const token = useToken();
   
   const {
