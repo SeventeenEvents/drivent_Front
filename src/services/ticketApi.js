@@ -9,4 +9,4 @@ export async function getTicketType(token) {
 
   return response.data;
 }
-//
+
