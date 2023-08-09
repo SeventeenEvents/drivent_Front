@@ -77,7 +77,7 @@ export default function Payment() {
 
       toast.success('Ingresso comprado com sucesso!');
     } catch (err) {
-      toast.error('Erro ao comprar ingresso');
+      console.log(err);
     }
   }
 

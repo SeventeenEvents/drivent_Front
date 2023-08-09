@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import HotelCard from './HotelCard';
-import { useEffect } from 'react';
 
 export default function HotelsList({ hotels }) {
   const [selectedHotel, setSelectedHotel] = useState();
