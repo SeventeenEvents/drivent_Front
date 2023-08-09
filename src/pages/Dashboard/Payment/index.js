@@ -17,7 +17,8 @@ export default function Payment() {
     selectedTicketId: [], // lista com length = 2; sendo selectedTicketId[0] o id do tipo de ingresso e o selectedTicketId[1] o id do card com hotel ou sem.
     isOnline: null,
     includesHotel: null,
-    hasEnrollment: false
+    hasEnrollment: false,
+    ticket: {}
   });
 
   function selectCard(card) {
@@ -76,6 +77,7 @@ export default function Payment() {
       });
 
       toast.success('Ingresso comprado com sucesso!');
+      setTickets({ ...tickets, ticket: response.data });
     } catch (err) {
       console.log(err);
     }
@@ -161,7 +163,7 @@ export default function Payment() {
     );
   }
   return(
-    <PaymentProcess ticket={ticket}/>
+    <PaymentProcess ticket={!ticket?tickets.ticket:ticket}/>
   );
 }
 
