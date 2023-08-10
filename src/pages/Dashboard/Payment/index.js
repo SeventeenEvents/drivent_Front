@@ -1,65 +1,169 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PaymentProcess from './paymentProcess';
-import useTickets from '../../../hooks/api/useTickets';
+import api from '../../../services/api';
+import useToken from '../../../hooks/useToken';
+import { getPersonalInformations } from '../../../services/enrollmentApi';
+import { toast } from 'react-toastify';
+import useTicketType from '../../../hooks/api/useTicketType';
+import useTicket from '../../../hooks/api/useTicket';
 export default function Payment() {
-  const [choices, setChoices] = useState({
-    ticketType: '',
-    isHotel: null,
-    reservedTicket: false,
-    ticketId: 0,
-  });
-  const { ticketType } = useTickets();
+  const token = useToken();
+  const data = useTicketType().ticketType;
+  const { ticket } = useTicket();
 
-  if (!choices.reservedTicket) {
+  const [tickets, setTickets] = useState({
+    reservedTicket: false,
+    selectedTicketId: [], // lista com length = 2; sendo selectedTicketId[0] o id do tipo de ingresso e o selectedTicketId[1] o id do card com hotel ou sem.
+    isOnline: null,
+    includesHotel: null,
+    hasEnrollment: false,
+    ticket: {}
+  });
+
+  function selectCard(card) {
+    if(tickets.isOnline === false) {
+      //card presencial sem hotel
+      if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: false });
+      //card presencial com hotel
+      if(!card.isRemote&&card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: true });
+    }
+
+    // Card Online
+    if(card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
+    // Card Presencial
+    if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
+  }
+
+  function price() {
+    //valor online
+    if(tickets.isOnline) return data.find(el => el.id === tickets.selectedTicketId[0]).price;
+    //valor da diferença de presencial + hotel
+    if(tickets.isOnline===false) {
+      const priceWithoutHotel = data.find(el => (!el.isRemote&&!el.includesHotel)).price;
+      const priceWithHotel = data.find(el => (!el.isRemote&&el.includesHotel)).price;
+      return priceWithHotel - priceWithoutHotel;
+    }
+  }
+  useEffect(() => {
+    async function checkUserEnrollment() {
+      try {
+        const personalInformations = await getPersonalInformations(token);
+        setTickets({ ...tickets, hasEnrollment: personalInformations !== null });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    checkUserEnrollment();
+  }, [token]);
+
+  async function reserved(id) {
+    const enrrolmentId = await api.get('/enrollments', { headers: { Authorization: `Bearer ${token}` } });
+
+    const body = {
+      ticketTypeId: id,
+      enrrolmentId: enrrolmentId.data.id,
+      status: 'RESERVED'
+    };
+
+    console.log(body);
+
+    try {
+      const response = await api.post('/tickets', body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setTickets({ ...tickets, ticket: response.data, reservedTicket: true });
+
+      toast.success('Ingresso reservado com sucesso!');
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  if (!tickets.reservedTicket&&ticket===null) {
     return (
       <TicketTypeContainer>
         <h1>Ingresso e pagamento</h1>
-        <CardToChoice>
-          <h3>Primeiro, escolha sua modalidade de ingresso</h3>
-          <CardContainer>
-            { ticketType?.map((ticket) => (
-              <Card key={ticket.id} className={choices.ticketType==='presencial' && ticket.id === choices.ticketId?'card_background':''} onClick={() => {setChoices({ ...choices, ticketType: 'presencial', ticketId: ticket.id }); console.log(ticketType);}}>
-                <h2>{ticket.name}</h2>
-                <h3>R$ {ticket.price}</h3>
-              </Card>
-            ))
-            }
-          </CardContainer>
-        </CardToChoice>
-  
         {
-          choices.ticketType==='presencial' ?
+          tickets.hasEnrollment ?
+            <>
+              <CardToChoice>
+                <h3>Primeiro, escolha sua modalidade de ingresso</h3>
+                <CardContainer>
+                  { 
+                    data?.filter(t => ((t.isRemote&&!t.includesHotel)||(!t.isRemote&&!t.includesHotel))).map((ticket) => (
+
+                      <Card 
+                        key={ticket.id} 
+                        onClick={() => {selectCard(ticket); console.log(ticket.id);}}
+                        className={tickets.selectedTicketId[0]===(ticket.id)?'card_background':''}
+                      >
+                        <h2>{ticket.name}</h2>
+                        <h3>R$ {ticket.price}</h3>
+                      </Card>
+
+                    ))
+                  }
+                </CardContainer>
+              </CardToChoice>
+        
+              {
+                tickets.isOnline === false?
+                  <CardToChoice>
+                    <h3>Ótimo! Agora escolha sua modalidade de hospedagem</h3>
+                    <CardContainer>
+                      { 
+                        data?.filter(t => ((!t.isRemote&&!t.includesHotel)||(!t.isRemote&&t.includesHotel))).map((ticket) => (
+
+                          <Card
+                            key={ticket.id}
+                            onClick={() => {selectCard(ticket); console.log(ticket.id);}}
+                            className={tickets.selectedTicketId[1]===(ticket.id)?'card_background':''}
+                          >
+                            <h2>{(!ticket.isRemote&&!ticket.includesHotel)?'sem Hotel':'Com Hotel'}</h2>
+                            <h3>+ R$ {(!ticket.isRemote&&!ticket.includesHotel)?0:price()}</h3>
+                          </Card>
+
+                        ))
+                      }
+                    </CardContainer>
+                  </CardToChoice>
+                  :''
+              }
+        
+              {
+                tickets.isOnline||tickets.includesHotel !== null?
+                  <CardToChoice>
+                    <h3>Fechado! O total ficou em R$ {tickets.isOnline?price():data.find(el => (el.id===tickets.selectedTicketId[1])).price}. Agora é só confirmar:</h3>
+                    <CardContainer>
+                      <FinishButton 
+                        onClick={() => {
+                          if(tickets.isOnline) {
+                            reserved(tickets.selectedTicketId[0]);
+                          }
+                          reserved(tickets.selectedTicketId[1]);
+                        }}
+                      >RESERVAR INGRESSO</FinishButton>
+                    </CardContainer>
+                  </CardToChoice>
+                  :''
+              }
+            </>
+            :
             <CardToChoice>
-              <h3>Ótimo! Agora escolha sua modalidade de hospedagem</h3>
-              <CardContainer>
-                <Card className={choices.isHotel===false?'card_background':''} onClick={() => {setChoices({ ...choices, isHotel: false }); console.log(choices);}}>
-                  <h2>Sem Hotel</h2>
-                  <h3>+ R$ 0</h3>
-                </Card>
-                <Card className={choices.isHotel===true?'card_background':''} onClick={() => {setChoices({ ...choices, isHotel: true }); console.log(choices);}}>
-                  <h2>Com Hotel</h2>
-                  <h3>+ R$ 350</h3>
-                </Card>
-              </CardContainer>
+              <h3> Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso </h3>
             </CardToChoice>
-            : ''
         }
-        {
-          choices.isHotel !== null||choices.ticketType==='online' ?
-            <CardToChoice>
-              <h3>Fechado! O total ficou em R$ {choices.ticketType==='online'?100:choices.isHotel===true?600:250}. Agora é só confirmar:</h3>
-              <CardContainer>
-                <FinishButton onClick={() => {setChoices({ ...choices, reservedTicket: true }); console.log(choices);}}>RESERVAR INGRESSO</FinishButton>
-              </CardContainer>
-            </CardToChoice>
-            : ''
-        }    
+           
       </TicketTypeContainer>
     );
   }
   return(
-    <PaymentProcess/>
+    <PaymentProcess ticket={!ticket?tickets.ticket:ticket}/>
   );
 }
 
@@ -111,9 +215,9 @@ const Card = styled.button`
   border-radius: 20px;
   border: 1px solid #CECECE;
 
-  :hover{
+  /* :hover{
     background-color: #FFEED2;
-  }
+  } */
 
   h2{
     color: #454545;
