@@ -35,13 +35,13 @@ const PaymentForm = ( { ticket } ) => {
       ticketId: ticket.ticketTypeId,
       cardData: {
         issuer: 'VISA',
-        number: state.number,
+        number: Number(state.number),
         name: state.name,
         expirationDate: `${state.expiry.slice(0, 2)}/${state.expiry.slice(-2)}`,
-        cvv: state.cvc,
+        cvv: Number(state.cvc),
       } 
     };
-    console.log(ticket);
+    console.log(body);
 
     try{
       await api.post('/payments/process', body, { headers: { Authorization: `Bearer ${token}` } });
@@ -49,6 +49,7 @@ const PaymentForm = ( { ticket } ) => {
       toast.success('Pagamento Realizado');
     }catch(err) {
       toast.error('Pagamento não realizado');
+      console.log(err);
     }
   }
   return (

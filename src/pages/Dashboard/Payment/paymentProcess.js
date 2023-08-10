@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import PaymentForm from '../../../components/Dashboard/Payment/paymentForm';
 
 export default function PaymentProcess({ ticket }) {
+  console.log(ticket);
   return (
     <TicketTypeContainer>
       <h1>Ingresso e pagamento</h1>

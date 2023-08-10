@@ -30,15 +30,15 @@ export default function Payment() {
     }
 
     // Card Online
-    if(card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true });
+    if(card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
     // Card Presencial
-    if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false });
+    if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
   }
 
   function price() {
     //valor online
     if(tickets.isOnline) return data.find(el => el.id === tickets.selectedTicketId[0]).price;
-    //valor da diferença de presencia + hotel
+    //valor da diferença de presencial + hotel
     if(tickets.isOnline===false) {
       const priceWithoutHotel = data.find(el => (!el.isRemote&&!el.includesHotel)).price;
       const priceWithHotel = data.find(el => (!el.isRemote&&el.includesHotel)).price;
@@ -75,9 +75,10 @@ export default function Payment() {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response.data);
+      setTickets({ ...tickets, ticket: response.data, reservedTicket: true });
 
-      toast.success('Ingresso comprado com sucesso!');
-      setTickets({ ...tickets, ticket: response.data });
+      toast.success('Ingresso reservado com sucesso!');
     } catch (err) {
       console.log(err);
     }
@@ -98,7 +99,7 @@ export default function Payment() {
 
                       <Card 
                         key={ticket.id} 
-                        onClick={() => selectCard(ticket)}
+                        onClick={() => {selectCard(ticket); console.log(ticket.id);}}
                         className={tickets.selectedTicketId[0]===(ticket.id)?'card_background':''}
                       >
                         <h2>{ticket.name}</h2>
@@ -120,7 +121,7 @@ export default function Payment() {
 
                           <Card
                             key={ticket.id}
-                            onClick={() => {selectCard(ticket); }}
+                            onClick={() => {selectCard(ticket); console.log(ticket.id);}}
                             className={tickets.selectedTicketId[1]===(ticket.id)?'card_background':''}
                           >
                             <h2>{(!ticket.isRemote&&!ticket.includesHotel)?'sem Hotel':'Com Hotel'}</h2>
@@ -141,7 +142,6 @@ export default function Payment() {
                     <CardContainer>
                       <FinishButton 
                         onClick={() => {
-                          setTickets({ ...tickets, reservedTicket: true });
                           if(tickets.isOnline) {
                             reserved(tickets.selectedTicketId[0]);
                           }
