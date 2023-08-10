@@ -59,11 +59,11 @@ export default function Payment() {
   }, [token]);
 
   async function reserved(id) {
-    const enrrolmentId = await api.get('/enrollments', { headers: { Authorization: `Bearer ${token}` } });
+    const enrollmentId = await api.get('/enrollments', { headers: { Authorization: `Bearer ${token}` } });
 
     const body = {
       ticketTypeId: id,
-      enrrolmentId: enrrolmentId.data.id,
+      enrollmentId: enrollmentId.data.id,
       status: 'RESERVED'
     };
 

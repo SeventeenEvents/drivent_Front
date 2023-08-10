@@ -32,19 +32,24 @@ const PaymentForm = ( { ticket } ) => {
   async function paymentSubmit(e) {
     e.preventDefault();
     const body = { 
-      ticketId: ticket.ticketTypeId,
+      ticketId: ticket.id,
       cardData: {
         issuer: 'VISA',
-        number: Number(state.number),
+        number: state.number,
         name: state.name,
         expirationDate: `${state.expiry.slice(0, 2)}/${state.expiry.slice(-2)}`,
-        cvv: Number(state.cvc),
+        cvv: state.cvc,
       } 
     };
     console.log(body);
+    console.log(token);
 
     try{
-      await api.post('/payments/process', body, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.post('/payments/process', body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setPay(true);
       toast.success('Pagamento Realizado');
     }catch(err) {
@@ -55,88 +60,85 @@ const PaymentForm = ( { ticket } ) => {
   return (
     <PaymentComponentContainer onSubmit={paymentSubmit}>
       <h3>Pagamento</h3>
-      {
-        !pay?
-          <PaymentContainer>
-            <CreditCard>
-              <Cards
-                number={state.number}
-                expiry={state.expiry}
-                cvc={state.cvc}
-                name={state.name}
-                focused={state.focus}
-              />
-            </CreditCard>
-            <CardInputs>
-              <input
-                title='Insira o número do seu cartão de crédito'
-                type="number"
-                name="number"
-                placeholder="Card Number"
-                value={state.number}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                required
-              />
-              <p>E.g.: 49...,51...,36...,37...</p>
-              <input 
-                title='Nome do proprietário do cartão de crédito' 
-                name='name' 
-                type='text' 
-                placeholder='Name' 
-                value={state.name}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                required
-              />
-              <article>
-                <input 
-                  title='Insira a data de validade do seu cartão' 
-                  name='expiry' 
-                  type='number'
-                  placeholder='Valid Thru'
-                  pattern='\d\d/\d\d'
-                  value={state.expiry}
+      { 
+        (pay||ticket.status==='PAID')?
+
+          <ConfirmedPayment>
+            <article>
+              <FaCheckCircle/>
+            </article>
+            <div>
+              <h2>Pagamento confirmado!</h2>
+              <h3>Prossiga para escolha de hospedagem e atividades</h3>
+            </div>
+          </ConfirmedPayment>
+          :
+          <>
+            <PaymentContainer>
+              <CreditCard>
+                <Cards
+                  number={state.number}
+                  expiry={state.expiry}
+                  cvc={state.cvc}
+                  name={state.name}
+                  focused={state.focus}
+                />
+              </CreditCard>
+              <CardInputs>
+                <input
+                  title='Insira o número do seu cartão de crédito'
+                  type="number"
+                  name="number"
+                  placeholder="Card Number"
+                  value={state.number}
                   onChange={handleInputChange}
                   onFocus={handleInputFocus}
                   required
                 />
+                <p>E.g.: 49...,51...,36...,37...</p>
                 <input 
-                  title='Insira o código de verificação do cartão' 
-                  name='cvc' 
-                  type='number'
-                  placeholder='CVC'
-                  pattern='\d{3,4}'
-                  value={state.cvc}
+                  title='Nome do proprietário do cartão de crédito' 
+                  name='name' 
+                  type='text' 
+                  placeholder='Name' 
+                  value={state.name}
                   onChange={handleInputChange}
-                  onFocus={handleInputFocus} 
+                  onFocus={handleInputFocus}
                   required
                 />
-              </article>
+                <article>
+                  <input 
+                    title='Insira a data de validade do seu cartão' 
+                    name='expiry' 
+                    type='number'
+                    placeholder='Valid Thru'
+                    pattern='\d\d/\d\d'
+                    value={state.expiry}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus}
+                    required
+                  />
+                  <input 
+                    title='Insira o código de verificação do cartão' 
+                    name='cvc' 
+                    type='number'
+                    placeholder='CVC'
+                    pattern='\d{3,4}'
+                    value={state.cvc}
+                    onChange={handleInputChange}
+                    onFocus={handleInputFocus} 
+                    required
+                  />
+                </article>
 
-            </CardInputs>
+              </CardInputs>
 
-          </PaymentContainer>
-          :''
-      }
-
-      { !pay?
-        <CardContainer>
-          <FinishButton type='submit'>FINALIZAR PAGAMENTO</FinishButton>
-        </CardContainer>
-        :''
-      }
-      { pay?
-        <ConfirmedPayment>
-          <article>
-            <FaCheckCircle/>
-          </article>
-          <div>
-            <h2>Pagamento confirmado!</h2>
-            <h3>Prossiga para escolha de hospedagem e atividades</h3>
-          </div>
-        </ConfirmedPayment>
-        :''
+            </PaymentContainer>
+            <CardContainer>
+              <FinishButton type='submit'>FINALIZAR PAGAMENTO</FinishButton>
+            </CardContainer>
+          </>
+          
       }
 
     </PaymentComponentContainer>
