@@ -22,17 +22,20 @@ export default function Payment() {
   });
 
   function selectCard(card) {
+    const presentWithoutHotel = (!card.isRemote&&!card.includesHotel);
+    const presentWithHotel = (!card.isRemote&&card.includesHotel);
+    const remote = (card.isRemote&&!card.includesHotel);
     if(tickets.isOnline === false) {
       //card presencial sem hotel
-      if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: false });
+      if(presentWithoutHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: false });
       //card presencial com hotel
-      if(!card.isRemote&&card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: true });
+      if(presentWithHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: true });
     }
 
     // Card Online
-    if(card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
+    if(remote) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
     // Card Presencial
-    if(!card.isRemote&&!card.includesHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
+    if(presentWithoutHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
   }
 
   function price() {
