@@ -1,89 +1,111 @@
 import styled from 'styled-components';
 import { BiLogIn } from 'react-icons/bi';
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 
 export default function ActivityDay() {
+  const [selectActivityDay, setSelectActivityDay] = useState({
+    isDaySelected: false,
+    dayId: 0,
+  });
+  const MOCK_LIST_DAYS = [
+    { id: 1, date: '2023-08-22' },
+    { id: 2, date: '2023-08-23' },
+    { id: 3, date: '2023-08-24' }
+  ];
   return (
     <ContainerActivities>
-      <h1>Escolha de atividades</h1>
       <OptionsSection>
-        <h3>Primeiro, filtre pelo dia do evento: </h3>
+        {
+          selectActivityDay.isDaySelected?
+            '':
+            <h3>Primeiro, filtre pelo dia do evento: </h3>
+        }
         <ButtonContainer>
-          <button>Sexta, 22/10</button>
-          <button>Sábado, 23/10</button>
-          <button>Domingo, 24/10</button>
+          {
+            MOCK_LIST_DAYS.map(day => (
+              <button className={selectActivityDay.dayId===day.id?'selected_day':''} onClick={() => {setSelectActivityDay({ ...selectActivityDay, isDaySelected: true, dayId: day.id });}}>
+                {dayjs(day.date).locale('pt-br').format('dddd, DD/MM')}
+              </button>
+            ))
+          }
         </ButtonContainer>
       </OptionsSection>
 
-      <AtivitySection>
+      {
+        selectActivityDay.isDaySelected?
+          <AtivitySection>
 
-        <PlaceActivities>
-          <h3>Auditório Principal</h3>
-          <ActivitiesOnPlace>
-            <CardActivity>
-              <NameAndTimeContainer>
-                <h3>Minecraft: montando o PC ideal</h3>
-                <p>09:00 - 10:00</p>
-              </NameAndTimeContainer>
-              <IconConatiner>
-                <BiLogIn/>
-                <p>27 vagas</p>
-              </IconConatiner>
-            </CardActivity>
+            <PlaceActivities>
+              <h3>Auditório Principal</h3>
+              <ActivitiesOnPlace>
+                <CardActivity>
+                  <NameAndTimeContainer>
+                    <h3>Minecraft: montando o PC ideal</h3>
+                    <p>09:00 - 10:00</p>
+                  </NameAndTimeContainer>
+                  <IconConatiner>
+                    <BiLogIn/>
+                    <p>27 vagas</p>
+                  </IconConatiner>
+                </CardActivity>
 
-            <CardActivity>
-              <NameAndTimeContainer>
-                <h3>Minecraft: Como ir para o Nether</h3>
-                <p>10:00 - 11:00</p>
-              </NameAndTimeContainer>
-              <IconConatiner className='sold_out'>
-                <AiOutlineCloseCircle/>
-                <p>Esgotado</p>
-              </IconConatiner>
-            </CardActivity>
-          </ActivitiesOnPlace>
-        </PlaceActivities>
+                <CardActivity>
+                  <NameAndTimeContainer>
+                    <h3>Minecraft: Como ir para o Nether</h3>
+                    <p>10:00 - 11:00</p>
+                  </NameAndTimeContainer>
+                  <IconConatiner className='sold_out'>
+                    <AiOutlineCloseCircle/>
+                    <p>Esgotado</p>
+                  </IconConatiner>
+                </CardActivity>
+              </ActivitiesOnPlace>
+            </PlaceActivities>
 
-        <PlaceActivities>
-          <h3>Auditório Lateral</h3>
-          <ActivitiesOnPlace>
-            <CardActivity className='selected_activity'>
+            <PlaceActivities>
+              <h3>Auditório Lateral</h3>
+              <ActivitiesOnPlace>
+                <CardActivity className='selected_activity'>
 
-              <NameAndTimeContainer>
-                <h3>Minecraft: montando o PC ideal</h3>
-                <p>09:00 - 10:00</p>
-              </NameAndTimeContainer>
+                  <NameAndTimeContainer>
+                    <h3>Minecraft: montando o PC ideal</h3>
+                    <p>09:00 - 10:00</p>
+                  </NameAndTimeContainer>
 
-              <IconConatiner>
-                <AiOutlineCheckCircle/>
-                <p>Inscrito</p>
-              </IconConatiner>
+                  <IconConatiner>
+                    <AiOutlineCheckCircle/>
+                    <p>Inscrito</p>
+                  </IconConatiner>
 
-            </CardActivity>
-          </ActivitiesOnPlace>
-        </PlaceActivities>
+                </CardActivity>
+              </ActivitiesOnPlace>
+            </PlaceActivities>
 
-        <PlaceActivities>
-          <h3>Sala de Workshop</h3>
-          <ActivitiesOnPlace>
-            <CardActivity>
+            <PlaceActivities>
+              <h3>Sala de Workshop</h3>
+              <ActivitiesOnPlace>
+                <CardActivity>
 
-              <NameAndTimeContainer>
-                <h3>Minecraft: montando o PC ideal</h3>
-                <p>09:00 - 10:00</p>
-              </NameAndTimeContainer>
+                  <NameAndTimeContainer>
+                    <h3>Minecraft: montando o PC ideal</h3>
+                    <p>09:00 - 10:00</p>
+                  </NameAndTimeContainer>
 
-              <IconConatiner>
-                <BiLogIn/>
-                <p>27 vagas</p>
-              </IconConatiner>
+                  <IconConatiner>
+                    <BiLogIn/>
+                    <p>27 vagas</p>
+                  </IconConatiner>
 
-            </CardActivity>
-          </ActivitiesOnPlace>
-        </PlaceActivities>
+                </CardActivity>
+              </ActivitiesOnPlace>
+            </PlaceActivities>
 
-      </AtivitySection>
-
+          </AtivitySection>
+          :''
+      }
     </ContainerActivities>
   );
 }
@@ -108,6 +130,9 @@ const ContainerActivities = styled.main`
 `;
 const OptionsSection = styled.div`
   //border: 1px solid red;//
+  .selected_day{
+    background-color: #FFD37D;
+  }
   margin-top: 37px;
   display: flex;
   flex-direction: column;
