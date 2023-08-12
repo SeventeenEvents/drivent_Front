@@ -24,23 +24,31 @@ export default function BookingResume() {
       });
   }, []);
 
-  console.log(userBooking);
+  function loadResume() {
+    if (userBooking.length === 0) {
+      return <p>Ainda não há reserva</p>;
+    } else {
+      return (
+        <CardContainer>
+          <img src={userBooking.Hotel.image} />
+          <div>
+            <h4>Quarto reservado:</h4>
+            <p>{userBooking.Room.name} (Single)</p>
+          </div>
+          <div>
+            <h4>Pessoas no seu quarto:</h4>
+            <p>Você e mais 2</p>
+          </div>
+        </CardContainer>
+      );
+    }
+  }
 
   return (
     <BookingContainer>
       <p className="title">Você já escolheu seu quarto:</p>
 
-      <CardContainer>
-        <img src={userBooking?.Hotel.image} />
-        <div>
-          <h4>Quarto reservado:</h4>
-          <p>{userBooking?.Room.name} (Single)</p>
-        </div>
-        <div>
-          <h4>Pessoas no seu quarto:</h4>
-          <p>Você e mais 2</p>
-        </div>
-      </CardContainer>
+      {loadResume()}
 
       <button>TROCAR DE QUARTO</button>
     </BookingContainer>
