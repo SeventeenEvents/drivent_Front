@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { BiLogIn } from 'react-icons/bi';
+import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 
 export default function ActivityDay() {
   return (
@@ -8,31 +10,75 @@ export default function ActivityDay() {
         <h3>Primeiro, filtre pelo dia do evento: </h3>
         <ButtonContainer>
           <button>Sexta, 22/10</button>
-          <button>Sexta, 22/10</button>
-          <button>Sexta, 22/10</button>
+          <button>Sábado, 23/10</button>
+          <button>Domingo, 24/10</button>
         </ButtonContainer>
       </OptionsSection>
 
       <AtivitySection>
 
         <PlaceActivities>
-          <h3>Local 1</h3>
+          <h3>Auditório Principal</h3>
           <ActivitiesOnPlace>
-            <p>Aqui virão atividades</p>
-          </ActivitiesOnPlace>
-        </PlaceActivities>
-        
-        <PlaceActivities>
-          <h3>Local 2</h3>
-          <ActivitiesOnPlace>
-            <p>Aqui virão atividades</p>
+            <CardActivity>
+              <NameAndTimeContainer>
+                <h3>Minecraft: montando o PC ideal</h3>
+                <p>09:00 - 10:00</p>
+              </NameAndTimeContainer>
+              <IconConatiner>
+                <BiLogIn/>
+                <p>27 vagas</p>
+              </IconConatiner>
+            </CardActivity>
+
+            <CardActivity>
+              <NameAndTimeContainer>
+                <h3>Minecraft: Como ir para o Nether</h3>
+                <p>10:00 - 11:00</p>
+              </NameAndTimeContainer>
+              <IconConatiner className='sold_out'>
+                <AiOutlineCloseCircle/>
+                <p>Esgotado</p>
+              </IconConatiner>
+            </CardActivity>
           </ActivitiesOnPlace>
         </PlaceActivities>
 
         <PlaceActivities>
-          <h3>Local 3</h3>
+          <h3>Auditório Lateral</h3>
           <ActivitiesOnPlace>
-            <p>Aqui virão atividades</p>
+            <CardActivity className='selected_activity'>
+
+              <NameAndTimeContainer>
+                <h3>Minecraft: montando o PC ideal</h3>
+                <p>09:00 - 10:00</p>
+              </NameAndTimeContainer>
+
+              <IconConatiner>
+                <AiOutlineCheckCircle/>
+                <p>Inscrito</p>
+              </IconConatiner>
+
+            </CardActivity>
+          </ActivitiesOnPlace>
+        </PlaceActivities>
+
+        <PlaceActivities>
+          <h3>Sala de Workshop</h3>
+          <ActivitiesOnPlace>
+            <CardActivity>
+
+              <NameAndTimeContainer>
+                <h3>Minecraft: montando o PC ideal</h3>
+                <p>09:00 - 10:00</p>
+              </NameAndTimeContainer>
+
+              <IconConatiner>
+                <BiLogIn/>
+                <p>27 vagas</p>
+              </IconConatiner>
+
+            </CardActivity>
           </ActivitiesOnPlace>
         </PlaceActivities>
 
@@ -97,7 +143,7 @@ const ButtonContainer = styled.div`
   }
 `;
 const AtivitySection = styled.section`
-  border: 1px solid green;//
+  //border: 1px solid green;//
 
   margin-top: 37px;
   display: flex;
@@ -107,23 +153,89 @@ const AtivitySection = styled.section`
   justify-content: space-between;
 `;
 const PlaceActivities = styled.div`
-  border: 1px solid red;//
+  //border: 1px solid red;//
   flex:1;
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  //width: 100px;
+  h3{
+    height: 27px;
+    color: #7B7B7B;
+    text-align: center;
+    font-size: 17px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
 `;
 const ActivitiesOnPlace = styled.div`
+  //background-color: black;
+  .selected_activity{
+    background-color: #D0FFDB;
+  }
+  border: 1px solid #D7D7D7;
   width: 100%;
   height: 100%;
-  background-color: black;
   padding: 10px 14px;
   color: #fff;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+`;
+const CardActivity = styled.div`
+  .sold_out{
+      color: #CC6666;
+  }
+  
+  width: 100%;
+  height: 79px;
+  padding: 10px;
+  border-radius: 5px;
+  background: #F1F1F1;
+
+  color: #343434;
+  font-style: normal;
+  line-height: normal;
+
+  display: flex;
+  align-items: center;
+`;
+const NameAndTimeContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  h3{
+    color: #343434;
+    text-align: left;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+  }
+  p{
+    color: #343434;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+`;
+const IconConatiner = styled.div`
+  border-left: 1px solid #CFCFCF;
+  color: #078632;
+  width: 66px;
+  height: 100%;
+  font-size: 25px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  p{
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
 `;
