@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import useToken from '../../../hooks/useToken';
 import api from '../../../services/api';
 import IsNotAvailable from '../../../components/Activies/IsNotAvailable';
+import ActivityDay from '../../../components/Dashboard/Activity/activityDay';
 
 export default function Activities() {
   const token = useToken();
@@ -76,7 +77,7 @@ export default function Activities() {
             </h1>
           </ErrorContainer>
         ) : (
-          <StyledH1>Aqui vai o componente de escolha de atividades</StyledH1>
+          <ActivityDay/> //componente que possui as atividades
         )
       ) : (
         <IsNotAvailable />
@@ -84,22 +85,6 @@ export default function Activities() {
     </>
   );
 }
-
-// Tirar depois
-const StyledH1 = styled.h1`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  margin: auto;
-  width: 60%;
-  height: 80%;
-
-  font-size: 40px;
-  font-weight: 400;
-  color: #fa904e;
-  text-align: center;
-`;
 
 const ActivitiesPageContainer = styled.div`
   display: flex;
