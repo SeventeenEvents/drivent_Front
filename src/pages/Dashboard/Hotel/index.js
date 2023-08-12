@@ -20,7 +20,7 @@ export default function Hotel() {
   useEffect(() => {
     console.log('entrou no useEffect');
     const hotelsList = axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}hotels`, headers)
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels`, headers)
       .then((res) => {
         setHotels(res.data);
         console.log(hotels);
