@@ -31,10 +31,10 @@ export default function BookingResume() {
       <p className="title">Você já escolheu seu quarto:</p>
 
       <CardContainer>
-        <img src={userBooking.Hotel.image} />
+        <img src={userBooking?.Hotel.image} />
         <div>
           <h4>Quarto reservado:</h4>
-          <p>{userBooking.Room.name} (Single)</p>
+          <p>{userBooking?.Room.name} (Single)</p>
         </div>
         <div>
           <h4>Pessoas no seu quarto:</h4>
