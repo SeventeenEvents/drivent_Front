@@ -18,26 +18,27 @@ export default function BookingResume() {
       .get(`${process.env.REACT_APP_API_BASE_URL}/booking`, headers)
       .then((res) => {
         setUserBooking(res.data);
-        console.log(userBooking);
       })
       .catch((error) => {
         console.log(error.message);
       });
   }, []);
 
+  console.log(userBooking);
+
   return (
     <BookingContainer>
       <p className="title">Você já escolheu seu quarto:</p>
 
       <CardContainer>
-        <img src="" />
+        <img src={userBooking.Hotel.image} />
         <div>
-          <h4>Tipos de acomodação:</h4>
-          <p>Single</p>
+          <h4>Quarto reservado:</h4>
+          <p>{userBooking.Room.name} (Single)</p>
         </div>
         <div>
-          <h4>Vagas disponíveis:</h4>
-          <p>2</p>
+          <h4>Pessoas no seu quarto:</h4>
+          <p>Você e mais 2</p>
         </div>
       </CardContainer>
 

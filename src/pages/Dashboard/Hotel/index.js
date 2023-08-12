@@ -9,7 +9,6 @@ export default function Hotel() {
   const [hotels, setHotels] = useState([]);
   const [includesHotel, setIncludesHotel] = useState(true);
   const [ticketPaid, setTicketPaid] = useState(true);
-  console.log('entrou no index hotel');
 
   const headers = {
     headers: {
@@ -18,7 +17,6 @@ export default function Hotel() {
   };
 
   useEffect(() => {
-    console.log('entrou no useEffect');
     const hotelsList = axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/hotels`, headers)
       .then((res) => {
