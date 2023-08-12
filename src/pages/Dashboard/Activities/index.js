@@ -1,3 +1,7 @@
+import ActivityDay from '../../../components/Dashboard/Activity/activityDay';
+
 export default function Activities() {
-  return 'Atividades: Em breve!';
+  return (
+    <ActivityDay/>
+  );
 }
