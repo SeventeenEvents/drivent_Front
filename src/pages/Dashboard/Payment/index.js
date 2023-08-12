@@ -5,11 +5,11 @@ import api from '../../../services/api';
 import useToken from '../../../hooks/useToken';
 import { getPersonalInformations } from '../../../services/enrollmentApi';
 import { toast } from 'react-toastify';
-import useTicketType from '../../../hooks/api/useTicketType';
+import useTicketType from '../../../hooks/api/useTicketTypes';
 import useTicket from '../../../hooks/api/useTicket';
 export default function Payment() {
   const token = useToken();
-  const data = useTicketType().ticketType;
+  const data = useTicketType().ticketTypes;
   const { ticket } = useTicket();
 
   const [tickets, setTickets] = useState({
