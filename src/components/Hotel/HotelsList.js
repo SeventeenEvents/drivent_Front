@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import HotelCard from './HotelCard';
+import BookingResume from './BookingResume';
 
 export default function HotelsList({ hotels }) {
   const [selectedHotel, setSelectedHotel] = useState();
@@ -17,6 +18,8 @@ export default function HotelsList({ hotels }) {
           return <HotelCard hotel={hotel} selectedHotel={selectedHotel} toggleHotel={() => toggleHotel(hotel.id)} />;
         })}
       </ListContainer>
+
+      <BookingResume />
     </>
   );
 }
