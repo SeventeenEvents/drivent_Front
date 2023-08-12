@@ -1,39 +1,69 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import PaymentProcess from './paymentProcess';
+import api from '../../../services/api';
 import useToken from '../../../hooks/useToken';
-import TicketBox from '../../../components/Tickets/TicketBox';
-import HotelBox from '../../../components/Tickets/HotelBox';
 import { getPersonalInformations } from '../../../services/enrollmentApi';
 import { toast } from 'react-toastify';
-import useTicketTypes from '../../../hooks/api/useTicketTypes';
-import api from '../../../services/api';
-
+import useTicketType from '../../../hooks/api/useTicketType';
+import useTicket from '../../../hooks/api/useTicket';
 export default function Payment() {
   const token = useToken();
-  const [types, setTypes] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [show, setShow] = useState(false);
-  const [price, setPrice] = useState(0);
-  const [includesHotel, setIncludesHotel] = useState(false);
-  const [isRemote, setIsRemote] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState([]);
-  const [hasEnrollment, setHasEnrollment] = useState(false);
+  const data = useTicketType().ticketType;
+  const { ticket } = useTicket();
 
-  // New
-  const [ticketTypeId, setTicketTypeId] = useState(0);
-  const { ticketTypes } = useTicketTypes();
+  const [tickets, setTickets] = useState({
+    reservedTicket: false,
+    selectedTicketId: [], // lista com length = 2; sendo selectedTicketId[0] o id do tipo de ingresso e o selectedTicketId[1] o id do card com hotel ou sem.
+    isOnline: null,
+    includesHotel: null,
+    hasEnrollment: false,
+    ticket: {},
+  });
 
-  useEffect(() => {
-    setTypes(ticketTypes);
+  function selectCard(card) {
+    const presentWithoutHotel = !card.isRemote && !card.includesHotel;
+    const presentWithHotel = !card.isRemote && card.includesHotel;
+    const remote = card.isRemote && !card.includesHotel;
+    if (tickets.isOnline === false) {
+      //card presencial sem hotel
+      if (presentWithoutHotel)
+        return setTickets({
+          ...tickets,
+          selectedTicketId: [tickets.selectedTicketId[0], card.id],
+          includesHotel: false,
+        });
+      //card presencial com hotel
+      if (presentWithHotel)
+        return setTickets({
+          ...tickets,
+          selectedTicketId: [tickets.selectedTicketId[0], card.id],
+          includesHotel: true,
+        });
+    }
 
-    console.log(ticketTypes);
-  }, [ticketTypes]);
+    // Card Online
+    if (remote) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
+    // Card Presencial
+    if (presentWithoutHotel)
+      return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
+  }
 
+  function price() {
+    //valor online
+    if (tickets.isOnline) return data.find((el) => el.id === tickets.selectedTicketId[0]).price;
+    //valor da diferença de presencial + hotel
+    if (tickets.isOnline === false) {
+      const priceWithoutHotel = data.find((el) => !el.isRemote && !el.includesHotel).price;
+      const priceWithHotel = data.find((el) => !el.isRemote && el.includesHotel).price;
+      return priceWithHotel - priceWithoutHotel;
+    }
+  }
   useEffect(() => {
     async function checkUserEnrollment() {
       try {
         const personalInformations = await getPersonalInformations(token);
-        setHasEnrollment(personalInformations !== null);
+        setTickets({ ...tickets, hasEnrollment: personalInformations !== null });
       } catch (err) {
         console.log(err);
       }
@@ -42,17 +72,13 @@ export default function Payment() {
     checkUserEnrollment();
   }, [token]);
 
-  async function submit() {
-    const enrrolmentId = await api.get('/enrollments', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  async function reserved(id) {
+    const enrollmentId = await api.get('/enrollments', { headers: { Authorization: `Bearer ${token}` } });
 
     const body = {
-      ticketTypeId: ticketTypeId,
-      enrrolmentId: enrrolmentId.data.id,
-      status: 'RESERVED'
+      ticketTypeId: id,
+      enrollmentId: enrollmentId.data.id,
+      status: 'RESERVED',
     };
 
     console.log(body);
@@ -63,149 +89,183 @@ export default function Payment() {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response.data);
+      setTickets({ ...tickets, ticket: response.data, reservedTicket: true });
 
-      toast.success('Ingresso comprado com sucesso!');
+      toast.success('Ingresso reservado com sucesso!');
     } catch (err) {
-      toast.error('Erro ao comprar ingresso');
+      console.log(err);
     }
   }
 
-  return (
-    <>
-      {hasEnrollment ? (
-        <>
-          <TicketsPageContainer>
-            <div>
-              <h1>Ingresso e Pagamento</h1>
-              <h2>Primeiro escolha sua modalidade de pagamento</h2>
-            </div>
-            <TicketsContainer>
-              {types.map((type) => (
-                <TicketBox
-                  key={type.id}
-                  name={type.name}
-                  price={type.price}
-                  id={type.id}
-                  isRemote={type.isRemote}
-                  setShow={setShow}
-                  setPrice={setPrice}
-                  selected={selected}
-                  setSelected={setSelected}
-                  setIncludesHotel={setIncludesHotel}
-                  setIsRemote={setIsRemote}
-                  selectedHotel={selectedHotel}
-                  setTicketTypeId={setTicketTypeId}
-                  type={type}
-                />
-              ))}
-            </TicketsContainer>
-            {!isRemote && includesHotel && (
-              <>
-                <div>
-                  <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
-                </div>
-                <HotelsContainer>
-                  <HotelBox
-                    includesHotel={true}
-                    setShow={setShow}
-                    setPrice={setPrice}
-                    selectedHotel={selectedHotel}
-                    setSelectedHotel={setSelectedHotel}
-                    setTicketTypeId={setTicketTypeId}
-                  />
-                </HotelsContainer>
-              </>
+  if (!tickets.reservedTicket && ticket === null) {
+    return (
+      <TicketTypeContainer>
+        <h1>Ingresso e pagamento</h1>
+        {tickets.hasEnrollment ? (
+          <>
+            <CardToChoice>
+              <h3>Primeiro, escolha sua modalidade de ingresso</h3>
+              <CardContainer>
+                {data
+                  ?.filter((t) => (t.isRemote && !t.includesHotel) || (!t.isRemote && !t.includesHotel))
+                  .map((ticket) => (
+                    <Card
+                      key={ticket.id}
+                      onClick={() => {
+                        selectCard(ticket);
+                        console.log(ticket.id);
+                      }}
+                      className={tickets.selectedTicketId[0] === ticket.id ? 'card_background' : ''}
+                    >
+                      <h2>{ticket.name}</h2>
+                      <h3>R$ {ticket.price}</h3>
+                    </Card>
+                  ))}
+              </CardContainer>
+            </CardToChoice>
+
+            {tickets.isOnline === false ? (
+              <CardToChoice>
+                <h3>Ótimo! Agora escolha sua modalidade de hospedagem</h3>
+                <CardContainer>
+                  {data
+                    ?.filter((t) => (!t.isRemote && !t.includesHotel) || (!t.isRemote && t.includesHotel))
+                    .map((ticket) => (
+                      <Card
+                        key={ticket.id}
+                        onClick={() => {
+                          selectCard(ticket);
+                          console.log(ticket.id);
+                        }}
+                        className={tickets.selectedTicketId[1] === ticket.id ? 'card_background' : ''}
+                      >
+                        <h2>{!ticket.isRemote && !ticket.includesHotel ? 'sem Hotel' : 'Com Hotel'}</h2>
+                        <h3>+ R$ {!ticket.isRemote && !ticket.includesHotel ? 0 : price()}</h3>
+                      </Card>
+                    ))}
+                </CardContainer>
+              </CardToChoice>
+            ) : (
+              ''
             )}
-            <CheckOutContainer show={show}>
-              <h3>
-                Fechado! O total ficou em <span>R$ {price}</span>. Agora é só confirmar:
-              </h3>
-              <button onClick={submit}>RESERVAR INGRESSO</button>
-            </CheckOutContainer>
-          </TicketsPageContainer>
-        </>
-      ) : (
-        <ErrorContainer>
-          <h3> Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso </h3>
-        </ErrorContainer>
-      )}
-    </>
-  );
+
+            {tickets.isOnline || tickets.includesHotel !== null ? (
+              <CardToChoice>
+                <h3>
+                  Fechado! O total ficou em R${' '}
+                  {tickets.isOnline ? price() : data.find((el) => el.id === tickets.selectedTicketId[1]).price}. Agora é
+                  só confirmar:
+                </h3>
+                <CardContainer>
+                  <FinishButton
+                    onClick={() => {
+                      if (tickets.isOnline) {
+                        reserved(tickets.selectedTicketId[0]);
+                      }
+                      reserved(tickets.selectedTicketId[1]);
+                    }}
+                  >
+                    RESERVAR INGRESSO
+                  </FinishButton>
+                </CardContainer>
+              </CardToChoice>
+            ) : (
+              ''
+            )}
+          </>
+        ) : (
+          <CardToChoice>
+            <h3> Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso </h3>
+          </CardToChoice>
+        )}
+      </TicketTypeContainer>
+    );
+  }
+  return <PaymentProcess ticket={!ticket ? tickets.ticket : ticket} />;
 }
 
-const TicketsPageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+const TicketTypeContainer = styled.main`
+  font-family: 'Roboto', sans-serif;
+  //border: 1px solid red;
+  width: 100%;
+  height: inherit;
+
+  .card_background {
+    background-color: #ffeed2;
+  }
 
   h1 {
     font-size: 34px;
     font-weight: 400;
+    line-height: 40px;
+    letter-spacing: 0em;
+    text-align: left;
   }
-
-  h2 {
-    margin-top: 34px;
+`;
+const CardToChoice = styled.div`
+  margin-top: 37px;
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  h3 {
+    color: #8e8e8e;
     font-size: 20px;
     font-weight: 400;
-    color: #8e8e8e;
+    line-height: 23px;
+    letter-spacing: 0em;
+    text-align: left;
   }
 `;
-
-const TicketsContainer = styled.div`
-  margin-top: 15px;
+const CardContainer = styled.div`
   display: flex;
+  gap: 24px;
 `;
-
-const HotelsContainer = styled.div`
-  margin-top: 15px;
+const Card = styled.button`
   display: flex;
-`;
-
-const CheckOutContainer = styled.div`
-  margin-top: 15px;
-  display: ${(props) => (props.show === false ? 'none' : 'flex')};
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 145px;
+  height: 145px;
+  border-radius: 20px;
+  border: 1px solid #cecece;
+
+  /* :hover{
+    background-color: #FFEED2;
+  } */
+
+  h2 {
+    color: #454545;
+    text-align: center;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
   h3 {
-    margin-top: 30px;
-    color: #8e8e8e;
-    font-size: 20px;
-    font-weight: 400px;
-  }
-
-  span {
-    font-weight: 700;
-  }
-
-  button {
-    margin-top: 15px;
-    width: 162px;
-    height: 37px;
-    border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    background-color: #e0e0e0;
-    box-shadow: 0px 2px 10px 2px rgba(221, 225, 230, 0.94);
-    cursor: pointer;
-
-    :hover {
-      border: solid 2px #cecece;
-    }
+    color: #898989;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
   }
 `;
+const FinishButton = styled.button`
+  width: 170px;
+  height: 37px;
 
-const ErrorContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border: none;
+  border-radius: 4px;
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
 
-  width: 100%;
-  height: 80%;
-
-  div {
-    width: 50%;
-  }
-
-  font-size: 20px;
+  color: #000;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
   font-weight: 400;
-  color: #8e8e8e;
-  line-height: 24px;
+  line-height: normal;
 `;
