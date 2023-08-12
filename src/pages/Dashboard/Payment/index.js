@@ -18,33 +18,44 @@ export default function Payment() {
     isOnline: null,
     includesHotel: null,
     hasEnrollment: false,
-    ticket: {}
+    ticket: {},
   });
 
   function selectCard(card) {
-    const presentWithoutHotel = (!card.isRemote&&!card.includesHotel);
-    const presentWithHotel = (!card.isRemote&&card.includesHotel);
-    const remote = (card.isRemote&&!card.includesHotel);
-    if(tickets.isOnline === false) {
+    const presentWithoutHotel = !card.isRemote && !card.includesHotel;
+    const presentWithHotel = !card.isRemote && card.includesHotel;
+    const remote = card.isRemote && !card.includesHotel;
+    if (tickets.isOnline === false) {
       //card presencial sem hotel
-      if(presentWithoutHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: false });
+      if (presentWithoutHotel)
+        return setTickets({
+          ...tickets,
+          selectedTicketId: [tickets.selectedTicketId[0], card.id],
+          includesHotel: false,
+        });
       //card presencial com hotel
-      if(presentWithHotel) return setTickets({ ...tickets, selectedTicketId: [tickets.selectedTicketId[0], card.id], includesHotel: true });
+      if (presentWithHotel)
+        return setTickets({
+          ...tickets,
+          selectedTicketId: [tickets.selectedTicketId[0], card.id],
+          includesHotel: true,
+        });
     }
 
     // Card Online
-    if(remote) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
+    if (remote) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: true, includesHotel: null });
     // Card Presencial
-    if(presentWithoutHotel) return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
+    if (presentWithoutHotel)
+      return setTickets({ ...tickets, selectedTicketId: [card.id], isOnline: false, includesHotel: null });
   }
 
   function price() {
     //valor online
-    if(tickets.isOnline) return data.find(el => el.id === tickets.selectedTicketId[0]).price;
+    if (tickets.isOnline) return data.find((el) => el.id === tickets.selectedTicketId[0]).price;
     //valor da diferença de presencial + hotel
-    if(tickets.isOnline===false) {
-      const priceWithoutHotel = data.find(el => (!el.isRemote&&!el.includesHotel)).price;
-      const priceWithHotel = data.find(el => (!el.isRemote&&el.includesHotel)).price;
+    if (tickets.isOnline === false) {
+      const priceWithoutHotel = data.find((el) => !el.isRemote && !el.includesHotel).price;
+      const priceWithHotel = data.find((el) => !el.isRemote && el.includesHotel).price;
       return priceWithHotel - priceWithoutHotel;
     }
   }
@@ -67,7 +78,7 @@ export default function Payment() {
     const body = {
       ticketTypeId: id,
       enrollmentId: enrollmentId.data.id,
-      status: 'RESERVED'
+      status: 'RESERVED',
     };
 
     console.log(body);
@@ -87,121 +98,124 @@ export default function Payment() {
     }
   }
 
-  if (!tickets.reservedTicket&&ticket===null) {
+  if (!tickets.reservedTicket && ticket === null) {
     return (
       <TicketTypeContainer>
         <h1>Ingresso e pagamento</h1>
-        {
-          tickets.hasEnrollment ?
-            <>
+        {tickets.hasEnrollment ? (
+          <>
+            <CardToChoice>
+              <h3>Primeiro, escolha sua modalidade de ingresso</h3>
+              <CardContainer>
+                {data
+                  ?.filter((t) => (t.isRemote && !t.includesHotel) || (!t.isRemote && !t.includesHotel))
+                  .map((ticket) => (
+                    <Card
+                      key={ticket.id}
+                      onClick={() => {
+                        selectCard(ticket);
+                        console.log(ticket.id);
+                      }}
+                      className={tickets.selectedTicketId[0] === ticket.id ? 'card_background' : ''}
+                    >
+                      <h2>{ticket.name}</h2>
+                      <h3>R$ {ticket.price}</h3>
+                    </Card>
+                  ))}
+              </CardContainer>
+            </CardToChoice>
+
+            {tickets.isOnline === false ? (
               <CardToChoice>
-                <h3>Primeiro, escolha sua modalidade de ingresso</h3>
+                <h3>Ótimo! Agora escolha sua modalidade de hospedagem</h3>
                 <CardContainer>
-                  { 
-                    data?.filter(t => ((t.isRemote&&!t.includesHotel)||(!t.isRemote&&!t.includesHotel))).map((ticket) => (
-
-                      <Card 
-                        key={ticket.id} 
-                        onClick={() => {selectCard(ticket); console.log(ticket.id);}}
-                        className={tickets.selectedTicketId[0]===(ticket.id)?'card_background':''}
+                  {data
+                    ?.filter((t) => (!t.isRemote && !t.includesHotel) || (!t.isRemote && t.includesHotel))
+                    .map((ticket) => (
+                      <Card
+                        key={ticket.id}
+                        onClick={() => {
+                          selectCard(ticket);
+                          console.log(ticket.id);
+                        }}
+                        className={tickets.selectedTicketId[1] === ticket.id ? 'card_background' : ''}
                       >
-                        <h2>{ticket.name}</h2>
-                        <h3>R$ {ticket.price}</h3>
+                        <h2>{!ticket.isRemote && !ticket.includesHotel ? 'sem Hotel' : 'Com Hotel'}</h2>
+                        <h3>+ R$ {!ticket.isRemote && !ticket.includesHotel ? 0 : price()}</h3>
                       </Card>
-
-                    ))
-                  }
+                    ))}
                 </CardContainer>
               </CardToChoice>
-        
-              {
-                tickets.isOnline === false?
-                  <CardToChoice>
-                    <h3>Ótimo! Agora escolha sua modalidade de hospedagem</h3>
-                    <CardContainer>
-                      { 
-                        data?.filter(t => ((!t.isRemote&&!t.includesHotel)||(!t.isRemote&&t.includesHotel))).map((ticket) => (
+            ) : (
+              ''
+            )}
 
-                          <Card
-                            key={ticket.id}
-                            onClick={() => {selectCard(ticket); console.log(ticket.id);}}
-                            className={tickets.selectedTicketId[1]===(ticket.id)?'card_background':''}
-                          >
-                            <h2>{(!ticket.isRemote&&!ticket.includesHotel)?'sem Hotel':'Com Hotel'}</h2>
-                            <h3>+ R$ {(!ticket.isRemote&&!ticket.includesHotel)?0:price()}</h3>
-                          </Card>
-
-                        ))
+            {tickets.isOnline || tickets.includesHotel !== null ? (
+              <CardToChoice>
+                <h3>
+                  Fechado! O total ficou em R${' '}
+                  {tickets.isOnline ? price() : data.find((el) => el.id === tickets.selectedTicketId[1]).price}. Agora é
+                  só confirmar:
+                </h3>
+                <CardContainer>
+                  <FinishButton
+                    onClick={() => {
+                      if (tickets.isOnline) {
+                        reserved(tickets.selectedTicketId[0]);
                       }
-                    </CardContainer>
-                  </CardToChoice>
-                  :''
-              }
-        
-              {
-                tickets.isOnline||tickets.includesHotel !== null?
-                  <CardToChoice>
-                    <h3>Fechado! O total ficou em R$ {tickets.isOnline?price():data.find(el => (el.id===tickets.selectedTicketId[1])).price}. Agora é só confirmar:</h3>
-                    <CardContainer>
-                      <FinishButton 
-                        onClick={() => {
-                          if(tickets.isOnline) {
-                            reserved(tickets.selectedTicketId[0]);
-                          }
-                          reserved(tickets.selectedTicketId[1]);
-                        }}
-                      >RESERVAR INGRESSO</FinishButton>
-                    </CardContainer>
-                  </CardToChoice>
-                  :''
-              }
-            </>
-            :
-            <CardToChoice>
-              <h3> Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso </h3>
-            </CardToChoice>
-        }
-           
+                      reserved(tickets.selectedTicketId[1]);
+                    }}
+                  >
+                    RESERVAR INGRESSO
+                  </FinishButton>
+                </CardContainer>
+              </CardToChoice>
+            ) : (
+              ''
+            )}
+          </>
+        ) : (
+          <CardToChoice>
+            <h3> Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso </h3>
+          </CardToChoice>
+        )}
       </TicketTypeContainer>
     );
   }
-  return(
-    <PaymentProcess ticket={!ticket?tickets.ticket:ticket}/>
-  );
+  return <PaymentProcess ticket={!ticket ? tickets.ticket : ticket} />;
 }
 
 const TicketTypeContainer = styled.main`
-    font-family: 'Roboto', sans-serif;
-    //border: 1px solid red;
-    width: 100%;
-    height: inherit;
+  font-family: 'Roboto', sans-serif;
+  //border: 1px solid red;
+  width: 100%;
+  height: inherit;
 
-    .card_background{
-      background-color: #FFEED2;
-    }
+  .card_background {
+    background-color: #ffeed2;
+  }
 
-    h1{
-      font-size: 34px;
-      font-weight: 400;
-      line-height: 40px;
-      letter-spacing: 0em;
-      text-align: left;
-    }
-    
+  h1 {
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 40px;
+    letter-spacing: 0em;
+    text-align: left;
+  }
 `;
 const CardToChoice = styled.div`
   margin-top: 37px;
   display: flex;
   flex-direction: column;
   gap: 17px;
-  h3{
-      color: #8E8E8E;
-      font-size: 20px;
-      font-weight: 400;
-      line-height: 23px;
-      letter-spacing: 0em;
-      text-align: left;
-    }
+  h3 {
+    color: #8e8e8e;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0em;
+    text-align: left;
+  }
 `;
 const CardContainer = styled.div`
   display: flex;
@@ -212,17 +226,17 @@ const Card = styled.button`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  
+
   width: 145px;
   height: 145px;
   border-radius: 20px;
-  border: 1px solid #CECECE;
+  border: 1px solid #cecece;
 
   /* :hover{
     background-color: #FFEED2;
   } */
 
-  h2{
+  h2 {
     color: #454545;
     text-align: center;
     font-size: 16px;
@@ -230,7 +244,7 @@ const Card = styled.button`
     font-weight: 400;
     line-height: normal;
   }
-  h3{
+  h3 {
     color: #898989;
     text-align: center;
     font-size: 14px;
@@ -240,18 +254,18 @@ const Card = styled.button`
   }
 `;
 const FinishButton = styled.button`
-    width: 170px;
-    height: 37px;
+  width: 170px;
+  height: 37px;
 
-    border: none;
-    border-radius: 4px;
-    background: #E0E0E0;
-    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
-  
-    color: #000;
-    text-align: center;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  `;
+  border: none;
+  border-radius: 4px;
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
+
+  color: #000;
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+`;
