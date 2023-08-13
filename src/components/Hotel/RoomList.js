@@ -1,42 +1,58 @@
 import styled from 'styled-components';
-import { FaUserAlt } from 'react-icons/fa';
+import RoomCard from './RoomCard';
+import { useState, useEffect } from 'react';
+import useToken from '../../hooks/useToken';
+import axios from 'axios';
 
-export default function RoomCard({ room, selectedRoom, toggleRoom }) {
-  //substituir 101 pelo id do quarto
+export default function RoomList({ selectedHotel }) {
+  console.log('entrou no room list e o hotel selecionado é ', selectedHotel);
+  const token = useToken();
+  const [selectedRoom, setSelectedRoom] = useState();
+  const [roomData, setRoomData] = useState();
+  useEffect(() => {
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const hotelWithRooms = axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${selectedHotel}`, headers)
+      .then((res) => {
+        console.log(res);
+        setRoomData(res.data.Rooms);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  function toggleRoom(roomId) {
+    if (roomId === selectedRoom) setSelectedRoom(null);
+    if (roomId !== selectedRoom) setSelectedRoom(roomId);
+  }
+
   return (
-    <ContainerCard selectedRoom={room.id === selectedRoom} onClick={() => toggleRoom(room.id)}>
-      <RoomNumber>{room.id}</RoomNumber>
-      <div>
-        <FaUserAlt />
-        <FaUserAlt />
-      </div>
-    </ContainerCard>
+    <>
+      <Subtitle>Ótima pedida! Agora escolha seu quarto:</Subtitle>
+      <ListContainer>
+        {roomData
+          ? roomData.map((room) => {
+              return <RoomCard room={room} selectedRoom={selectedRoom} toggleRoom={() => toggleRoom(room.id)} />;
+            })
+          : 'Hotel sem quartos!'}
+      </ListContainer>
+    </>
   );
 }
 
-const ContainerCard = styled.div`
-  width: 190px;
-  height: 45px;
-  border-radius: 10px;
-  border: 1px solid #cecece;
+const ListContainer = styled.div`
+  gap: 20px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  background: ${({ selectedRoom }) => (selectedRoom ? '#ffeed2' : '#ebebeb')};
-
-  div {
-    display: flex;
-    gap: 3px;
-    font-size: 22px;
-  }
+  flex-direction: row;
+  flex-wrap: wrap;
 `;
 
-const RoomNumber = styled.p`
-  font-family: Roboto;
+const Subtitle = styled.h2`
+  color: #8e8e8e;
   font-size: 20px;
-  font-weight: 700;
-  line-height: 23px;
-  letter-spacing: 0em;
-  text-align: center;
+  line-height: 24px;
+  padding: 15px 0px;
 `;

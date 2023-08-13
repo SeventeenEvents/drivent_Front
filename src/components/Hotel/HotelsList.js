@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import HotelCard from './HotelCard';
 import BookingResume from './BookingResume';
+import RoomList from './RoomList';
 
 export default function HotelsList({ hotels }) {
-  const [selectedHotel, setSelectedHotel] = useState();
-
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  console.log(hotels);
   function toggleHotel(hotelId) {
-    if (hotelId === selectedHotel) setSelectedHotel(null);
+    if (hotelId === selectedHotel) setSelectedHotel();
     if (hotelId !== selectedHotel) setSelectedHotel(hotelId);
   }
 
@@ -20,6 +21,7 @@ export default function HotelsList({ hotels }) {
       </ListContainer>
 
       <BookingResume />
+      {selectedHotel ? <RoomList selectedHotel={selectedHotel} /> : ''}
     </>
   );
 }

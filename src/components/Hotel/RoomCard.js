@@ -5,7 +5,7 @@ export default function RoomCard({ room, selectedRoom, toggleRoom }) {
   //substituir 101 pelo id do quarto
   return (
     <ContainerCard selectedRoom={room.id === selectedRoom} onClick={() => toggleRoom(room.id)}>
-      <RoomNumber>{room.id}</RoomNumber>
+      <RoomNumber>{room.name}</RoomNumber>
       <div>
         <FaUserAlt />
         <FaUserAlt />
@@ -29,6 +29,9 @@ const ContainerCard = styled.div`
     display: flex;
     gap: 3px;
     font-size: 22px;
+    svg:first-child {
+      color: ${({ selectedRoom }) => (selectedRoom ? 'hotpink' : 'inherit')};
+    }
   }
 `;
 
