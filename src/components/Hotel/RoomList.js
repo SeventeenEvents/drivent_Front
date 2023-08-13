@@ -1,9 +1,28 @@
 import styled from 'styled-components';
 import RoomCard from './RoomCard';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import useToken from '../../hooks/useToken';
+import axios from 'axios';
 
-export default function RoomList({ rooms }) {
+export default function RoomList({ selectedHotel }) {
+  console.log('entrou no room list e o hotel selecionado é ', selectedHotel);
+  const token = useToken();
   const [selectedRoom, setSelectedRoom] = useState();
+  const [roomData, setRoomData] = useState();
+  useEffect(() => {
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const hotelWithRooms = axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${selectedHotel}`, headers)
+      .then((res) => {
+        console.log(res);
+        setRoomData(res.data.Rooms);
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   function toggleRoom(roomId) {
     if (roomId === selectedRoom) setSelectedRoom(null);
@@ -14,9 +33,9 @@ export default function RoomList({ rooms }) {
     <>
       <Subtitle>Ótima pedida! Agora escolha seu quarto:</Subtitle>
       <ListContainer>
-        {rooms.map((room) => {
+        {roomData ? roomData.map((room) => {
           return <RoomCard room={room} selectedRoom={selectedRoom} toggleRoom={() => toggleRoom(room.id)} />;
-        })}
+        }) : 'Hotel sem quartos!'}
       </ListContainer>
     </>
   );
@@ -25,7 +44,7 @@ export default function RoomList({ rooms }) {
 const ListContainer = styled.div`
   gap: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
 `;
 
