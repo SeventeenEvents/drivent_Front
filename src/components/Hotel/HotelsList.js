@@ -6,6 +6,7 @@ import RoomList from './RoomList';
 import useToken from '../../hooks/useToken';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { set } from 'date-fns';
 
 export default function HotelsList({ hotels }) {
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -13,6 +14,7 @@ export default function HotelsList({ hotels }) {
   const [selectedRoom, setSelectedRoom] = useState();
   const [userBooking, setUserBooking] = useState([]);
   const [bookingChange, setBookingChange] = useState(false);
+  const [updateRoomStatus, setUpdateRoomStatus] = useState(false);
 
   function toggleHotel(hotelId) {
     if (hotelId === selectedHotel) setSelectedHotel();
@@ -41,20 +43,41 @@ export default function HotelsList({ hotels }) {
       hotelId: selectedHotel,
     };
 
-    const promise = axios
+    axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/booking`, body, headers)
       .then(() => {
         toast.success('Reserva de quarto efetuada com sucesso!');
         setBookingChange(true);
+        setUpdateRoomStatus(false);
       })
       .catch((error) => {
         console.log(error.message);
       });
   }
 
+  function updateBooking() {
+    const body = {
+      roomId: selectedRoom,
+      hotelId: selectedHotel,
+    };
+
+    axios
+      .put(`${process.env.REACT_APP_API_BASE_URL}/booking/${userBooking.id}`, body, headers)
+      .then(() => {
+        toast.success('Reserva de quarto atualizada com sucesso!');
+        setBookingChange(true);
+        setUpdateRoomStatus(false);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
+
+  console.log('Reservas: ' + userBooking.length + 'Atualizando reserva: ' + updateRoomStatus);
+
   return (
     <>
-      {userBooking.length === 0 ? (
+      {userBooking.length === 0 || updateRoomStatus ? (
         <div>
           <Subtitle>Primeiro, escolha seu hotel</Subtitle>
           <ListContainer>
@@ -71,12 +94,14 @@ export default function HotelsList({ hotels }) {
             <RoomList selectedRoom={selectedRoom} setSelectedRoom={setSelectedRoom} selectedHotel={selectedHotel} />
           )}
 
-          {selectedRoom != null && selectedHotel != null && (
+          {selectedRoom != null && selectedHotel != null && updateRoomStatus === false ? (
             <SendBookingButton onClick={sendBooking}>RESERVAR QUARTO</SendBookingButton>
+          ) : (
+            <UpdateBookingButton onClick={updateBooking}>ALTERAR RESERVA</UpdateBookingButton>
           )}
         </div>
       ) : (
-        <BookingResume userBooking={userBooking} setUserBooking={setUserBooking} />
+        <BookingResume userBooking={userBooking} setUpdateRoomStatus={setUpdateRoomStatus} />
       )}
     </>
   );
@@ -89,6 +114,21 @@ const ListContainer = styled.div`
 `;
 
 const SendBookingButton = styled.button`
+  border-radius: 4px;
+  border: none;
+  padding: 12px;
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
+  color: #000;
+  text-align: center;
+  font-family: Roboto;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  margin-top: 46px;
+`;
+
+const UpdateBookingButton = styled.button`
   border-radius: 4px;
   border: none;
   padding: 12px;

@@ -1,7 +1,7 @@
 import useToken from '../../hooks/useToken';
 import styled from 'styled-components';
 
-export default function BookingResume({ userBooking }) {
+export default function BookingResume({ userBooking, setUpdateRoomStatus }) {
   const token = useToken();
 
   function loadResume() {
@@ -30,7 +30,7 @@ export default function BookingResume({ userBooking }) {
 
       {loadResume()}
 
-      <button>TROCAR DE QUARTO</button>
+      <button onClick={() => setUpdateRoomStatus(true)}>TROCAR DE QUARTO</button>
     </BookingContainer>
   );
 }
