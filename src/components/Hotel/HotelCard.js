@@ -16,7 +16,7 @@ export default function HotelCard({ hotel, toggleHotel, selectedHotel }) {
       },
     };
     const hotelRooms = axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}hotels/${hotel.id}`, headers)
+      .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${hotel.id}`, headers)
       .then((res) => {
         setRoomsData(res.data.Rooms);
         setCapacity(getHotelCapacity(res.data.Rooms));
