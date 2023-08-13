@@ -9,7 +9,6 @@ export default function Hotel() {
   const [hotels, setHotels] = useState([]);
   const [includesHotel, setIncludesHotel] = useState(true);
   const [ticketPaid, setTicketPaid] = useState(true);
-  console.log('entrou no index hotel');
 
   const headers = {
     headers: {
@@ -18,7 +17,6 @@ export default function Hotel() {
   };
 
   useEffect(() => {
-    console.log('entrou no useEffect');
     const hotelsList = axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/hotels`, headers)
       .then((res) => {
@@ -53,7 +51,6 @@ export default function Hotel() {
   return (
     <>
       <Title>Escolha de quarto e hotel</Title>
-      <Subtitle>Primeiro, escolha seu hotel</Subtitle>
       <HotelsList hotels={hotels} />
     </>
   );
@@ -70,4 +67,5 @@ const Title = styled.h1`
   font-family: Roboto;
   font-size: 34px;
   font-weight: 400;
+  margin-bottom: 36px;
 `;
