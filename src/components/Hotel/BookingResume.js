@@ -1,28 +1,8 @@
-import { useState, useEffect } from 'react';
 import useToken from '../../hooks/useToken';
-import axios from 'axios';
 import styled from 'styled-components';
 
-export default function BookingResume() {
-  const [userBooking, setUserBooking] = useState([]);
+export default function BookingResume({ userBooking }) {
   const token = useToken();
-
-  const headers = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_BASE_URL}/booking`, headers)
-      .then((res) => {
-        setUserBooking(res.data);
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  }, []);
 
   function loadResume() {
     if (userBooking.length === 0) {

@@ -51,7 +51,6 @@ export default function Hotel() {
   return (
     <>
       <Title>Escolha de quarto e hotel</Title>
-      <Subtitle>Primeiro, escolha seu hotel</Subtitle>
       <HotelsList hotels={hotels} />
     </>
   );
@@ -68,4 +67,5 @@ const Title = styled.h1`
   font-family: Roboto;
   font-size: 34px;
   font-weight: 400;
+  margin-bottom: 36px;
 `;

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HotelCard from './HotelCard';
 import BookingResume from './BookingResume';
 import RoomList from './RoomList';
@@ -10,6 +10,7 @@ export default function HotelsList({ hotels }) {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const token = useToken();
   const [selectedRoom, setSelectedRoom] = useState();
+  const [userBooking, setUserBooking] = useState([]);
   console.log('Hotel selecionado: ' + selectedHotel + 'Quarto selecionado' + selectedRoom);
 
   function toggleHotel(hotelId) {
@@ -23,15 +24,28 @@ export default function HotelsList({ hotels }) {
     },
   };
 
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/booking`, headers)
+      .then((res) => {
+        setUserBooking(res.data);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }, []);
+
   function sendBooking() {
     const body = {
       roomId: selectedRoom,
-      hotelId: selectedHotel
+      hotelId: selectedHotel,
     };
 
     const promise = axios
       .post(`${process.env.REACT_APP_API_BASE_URL}/booking`, body, headers)
-      .then(() => { alert('Reserva de quarto efetuada com sucesso!'); })
+      .then(() => {
+        alert('Reserva de quarto efetuada com sucesso!');
+      })
       .catch((error) => {
         console.log(error.message);
       });
@@ -39,23 +53,30 @@ export default function HotelsList({ hotels }) {
 
   return (
     <>
-      <ListContainer>
-        {hotels.map((hotel) => {
-          return <HotelCard hotel={hotel} selectedHotel={selectedHotel} toggleHotel={() => toggleHotel(hotel.id)} />;
-        })}
-      </ListContainer>
-
-      {/* <BookingResume /> */}
-      {selectedHotel ? (
-        <RoomList selectedRoom={selectedRoom} setSelectedRoom={setSelectedRoom} selectedHotel={selectedHotel} />
+      {userBooking.length === 0 ? (
+        <div>
+          <Subtitle>Primeiro, escolha seu hotel</Subtitle>
+          <ListContainer>
+            {hotels.map((hotel) => (
+              <HotelCard
+                key={hotel.id}
+                hotel={hotel}
+                selectedHotel={selectedHotel}
+                toggleHotel={() => toggleHotel(hotel.id)}
+              />
+            ))}
+          </ListContainer>
+        </div>
       ) : (
-        ''
+        <BookingResume userBooking={userBooking} setUserBooking={setUserBooking} />
       )}
 
-      {(selectedRoom != null && selectedHotel != null) ? (
+      {selectedHotel && (
+        <RoomList selectedRoom={selectedRoom} setSelectedRoom={setSelectedRoom} selectedHotel={selectedHotel} />
+      )}
+
+      {selectedRoom != null && selectedHotel != null && (
         <SendBookingButton onClick={sendBooking}>RESERVAR QUARTO</SendBookingButton>
-      ) : (
-        ''
       )}
     </>
   );
@@ -80,4 +101,11 @@ const SendBookingButton = styled.button`
   font-style: normal;
   font-weight: 400;
   margin-top: 46px;
+`;
+
+const Subtitle = styled.h2`
+  color: #8e8e8e;
+  font-size: 20px;
+  line-height: 24px;
+  padding: 15px 0px;
 `;
