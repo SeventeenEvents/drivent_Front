@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react';
 import useToken from '../../hooks/useToken';
 import axios from 'axios';
 
-export default function RoomList({ selectedHotel }) {
+export default function RoomList({ selectedHotel, selectedRoom, setSelectedRoom }) {
   console.log('entrou no room list e o hotel selecionado é ', selectedHotel);
   const token = useToken();
-  const [selectedRoom, setSelectedRoom] = useState();
   const [roomData, setRoomData] = useState();
   useEffect(() => {
     const headers = {
@@ -27,6 +26,7 @@ export default function RoomList({ selectedHotel }) {
   function toggleRoom(roomId) {
     if (roomId === selectedRoom) setSelectedRoom(null);
     if (roomId !== selectedRoom) setSelectedRoom(roomId);
+    console.log('Hotel selecionado: ' + selectedHotel + 'Quarto selecionado' + selectedRoom);
   }
 
   return (
@@ -35,8 +35,8 @@ export default function RoomList({ selectedHotel }) {
       <ListContainer>
         {roomData
           ? roomData.map((room) => {
-              return <RoomCard room={room} selectedRoom={selectedRoom} toggleRoom={() => toggleRoom(room.id)} />;
-            })
+            return <RoomCard room={room} selectedRoom={selectedRoom} toggleRoom={() => toggleRoom(room.id)} />;
+          })
           : 'Hotel sem quartos!'}
       </ListContainer>
     </>
