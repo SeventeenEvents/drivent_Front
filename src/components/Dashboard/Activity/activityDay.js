@@ -6,6 +6,9 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
 import api from '../../../services/api';
 import useToken from '../../../hooks/useToken';
+import VacancyActivity from './vacancyActivy';
+import NotVacancyActivity from './notVacancyActivy';
+import SubscribedActivity from './subscribedActivity';
 
 export default function ActivityDay() {
   const [selectActivityDay, setSelectActivityDay] = useState({
@@ -13,12 +16,8 @@ export default function ActivityDay() {
     day: 0,
   });
   const [activities, setActivities] = useState([]);
-
-  const MOCK_LIST_DAYS = [
-    { id: 1, date: '2023-08-22' },
-    { id: 2, date: '2023-08-23' },
-    { id: 3, date: '2023-08-24' }
-  ];
+  const [reserved, setReserved] = useState([]);
+  const [reloadUseEffect, setReloadUseEffect] = ([]);
 
   const token = useToken();
 
@@ -35,10 +34,24 @@ export default function ActivityDay() {
       console.log(error);
     }
   }
+  async function getReservedActivities() {
+    try {
+      const reservedActivities = await api.get('/activities/reserved', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(reservedActivities.data);
+      setReserved(reservedActivities.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     getActivities();
-  }, []);
+    getReservedActivities();
+  }, [reloadUseEffect]);
 
   return (
     <ContainerActivities>
@@ -50,9 +63,9 @@ export default function ActivityDay() {
         }
         <ButtonContainer>
           {
-            activities.date?.map((d, i) => (
-              <button key={i} className={selectActivityDay.day === d.day ? 'selected_day' : ''} onClick={() => { setSelectActivityDay({ ...selectActivityDay, isDaySelected: true, day: d.day }); }}>
-                {dayjs(d.day).locale('pt-br').format('dddd, DD/MM').split('-feira')}
+            activities.days?.map((day, i) => (
+              <button key={i} className={selectActivityDay.day === day ? 'selected_day' : ''} onClick={() => { setSelectActivityDay({ ...selectActivityDay, isDaySelected: true, day: day }); }}>
+                {dayjs(day).locale('pt-br').format('dddd, DD/MM').split('-feira')}
               </button>
             ))
           }
@@ -63,70 +76,54 @@ export default function ActivityDay() {
         selectActivityDay.isDaySelected ?
           <AtivitySection>
 
-            <PlaceActivities>
-              <h3>Auditório Principal</h3>
-              <ActivitiesOnPlace>
-                <CardActivity>
-                  <NameAndTimeContainer>
-                    <h3>Minecraft: montando o PC ideal</h3>
-                    <p>09:00 - 10:00</p>
-                  </NameAndTimeContainer>
-                  <IconConatiner>
-                    <BiLogIn />
-                    <p>27 vagas</p>
-                  </IconConatiner>
-                </CardActivity>
+            {
+              activities.locations?.map((location, i) => (
 
-                <CardActivity>
-                  <NameAndTimeContainer>
-                    <h3>Minecraft: Como ir para o Nether</h3>
-                    <p>10:00 - 11:00</p>
-                  </NameAndTimeContainer>
-                  <IconConatiner className='sold_out'>
-                    <AiOutlineCloseCircle />
-                    <p>Esgotado</p>
-                  </IconConatiner>
-                </CardActivity>
-              </ActivitiesOnPlace>
-            </PlaceActivities>
+                <PlaceActivities key={i}>
+                  <h3>{location}</h3>
+                  <ActivitiesOnPlace>
+                    {
+                      activities.activities?.map(function(activity) {
+                        if(activity.day === selectActivityDay.day && location === activity.location) {
+                          if(activity.vacancies>0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return(
+                              <VacancyActivity
+                                key={activity.id}
+                                name={activity.name}
+                                startAt={activity.startAt}
+                                endAt={activity.endAt}
+                                vacancies={activity.vacancies}
+                                activityId={activity.id}
+                                setReloadUseEffect={setReloadUseEffect}
+                              />);
+                          }
+                          if(activity.vacancies===0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return(
+                              <NotVacancyActivity
+                                key={activity.id}
+                                name={activity.name}
+                                startAt={activity.startAt}
+                                endAt={activity.endAt}
+                              />);
+                          }
+                          if(activity.vacancies>0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return(
+                              <SubscribedActivity
+                                key={activity.id}
+                                name={activity.name}
+                                startAt={activity.startAt}
+                                endAt={activity.endAt}
+                              />);
+                          }
+                        }
+                        return '';
+                      })
+                    }
 
-            <PlaceActivities>
-              <h3>Auditório Lateral</h3>
-              <ActivitiesOnPlace>
-                <CardActivity className='selected_activity'>
-
-                  <NameAndTimeContainer>
-                    <h3>Minecraft: montando o PC ideal</h3>
-                    <p>09:00 - 10:00</p>
-                  </NameAndTimeContainer>
-
-                  <IconConatiner>
-                    <AiOutlineCheckCircle />
-                    <p>Inscrito</p>
-                  </IconConatiner>
-
-                </CardActivity>
-              </ActivitiesOnPlace>
-            </PlaceActivities>
-
-            <PlaceActivities>
-              <h3>Sala de Workshop</h3>
-              <ActivitiesOnPlace>
-                <CardActivity>
-
-                  <NameAndTimeContainer>
-                    <h3>Minecraft: montando o PC ideal</h3>
-                    <p>09:00 - 10:00</p>
-                  </NameAndTimeContainer>
-
-                  <IconConatiner>
-                    <BiLogIn />
-                    <p>27 vagas</p>
-                  </IconConatiner>
-
-                </CardActivity>
-              </ActivitiesOnPlace>
-            </PlaceActivities>
+                  </ActivitiesOnPlace>
+                </PlaceActivities>
+              ))
+            }
 
           </AtivitySection>
           : ''
@@ -221,10 +218,7 @@ const PlaceActivities = styled.div`
   }
 `;
 const ActivitiesOnPlace = styled.div`
-  //background-color: black;
-  .selected_activity{
-    background-color: #D0FFDB;
-  }
+  
   border: 1px solid #D7D7D7;
   width: 100%;
   height: 100%;
@@ -234,59 +228,4 @@ const ActivitiesOnPlace = styled.div`
   gap: 10px;
   flex-direction: column;
   align-items: center;
-`;
-const CardActivity = styled.div`
-  .sold_out{
-      color: #CC6666;
-  }
-  
-  width: 100%;
-  height: 79px;
-  padding: 10px;
-  border-radius: 5px;
-  background: #F1F1F1;
-
-  color: #343434;
-  font-style: normal;
-  line-height: normal;
-
-  display: flex;
-  align-items: center;
-`;
-const NameAndTimeContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  h3{
-    color: #343434;
-    text-align: left;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-  }
-  p{
-    color: #343434;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
-`;
-const IconConatiner = styled.div`
-  border-left: 1px solid #CFCFCF;
-  color: #078632;
-  width: 66px;
-  height: 100%;
-  font-size: 25px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  p{
-    font-size: 9px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
 `;
