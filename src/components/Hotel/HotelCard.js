@@ -46,6 +46,7 @@ const CardContainer = styled.div`
   border-radius: 10px;
   background: ${({ selectedHotel }) => (selectedHotel ? '#ffeed2' : '#ebebeb')};
   padding: 15px;
+  cursor: pointer;
 
   img {
     border-radius: 5px;
@@ -84,5 +85,5 @@ function getHotelCapacity(roomsList) {
 function getTypes(roomsList) {
   let types = [];
   if (!roomsList || !roomsList.length) return types;
-  roomsList.forEach((room) => {});
+  roomsList.forEach((room) => { });
 }
