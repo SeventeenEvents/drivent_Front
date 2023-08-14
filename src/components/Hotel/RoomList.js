@@ -5,7 +5,6 @@ import useToken from '../../hooks/useToken';
 import axios from 'axios';
 
 export default function RoomList({ selectedHotel }) {
-  console.log('entrou no room list e o hotel selecionado é ', selectedHotel);
   const token = useToken();
   const [selectedRoom, setSelectedRoom] = useState();
   const [roomData, setRoomData] = useState();
@@ -18,11 +17,10 @@ export default function RoomList({ selectedHotel }) {
     const hotelWithRooms = axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${selectedHotel}`, headers)
       .then((res) => {
-        console.log(res);
         setRoomData(res.data.Rooms);
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [selectedHotel]);
 
   function toggleRoom(roomId) {
     if (roomId === selectedRoom) setSelectedRoom(null);

@@ -1,8 +1,31 @@
 import styled from 'styled-components';
 import { FaUserAlt } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import useToken from '../../hooks/useToken';
+import axios from 'axios';
 
 export default function RoomCard({ room, selectedRoom, toggleRoom }) {
+  const token = useToken();
+  const [roomData, setRoomData] = useState();
   //substituir 101 pelo id do quarto
+  useEffect(() => {
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    if (selectedRoom) {
+      const roomBookings = axios
+        .get(`${process.env.REACT_APP_API_BASE_URL}/booking/room/${selectedRoom}`, headers)
+        .then((res) => {
+          console.log('use efect do room cardddd');
+          console.log('entrou no room list e o quarto selecionado é ', selectedRoom);
+          console.log(res.data);
+          setRoomData(res.data);
+        })
+        .catch((error) => console.log(error));
+    }
+  }, [selectedRoom]);
   return (
     <ContainerCard selectedRoom={room.id === selectedRoom} onClick={() => toggleRoom(room.id)}>
       <RoomNumber>{room.name}</RoomNumber>
@@ -30,8 +53,8 @@ const ContainerCard = styled.div`
     gap: 3px;
     font-size: 22px;
     svg:first-child {
-    color: ${({ selectedRoom }) => (selectedRoom ? 'hotpink' : 'inherit')};
-  }
+      color: ${({ selectedRoom }) => (selectedRoom ? 'hotpink' : 'inherit')};
+    }
   }
 `;
 
