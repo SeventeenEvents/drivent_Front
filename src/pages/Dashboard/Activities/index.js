@@ -34,33 +34,33 @@ export default function Activities() {
     checkUserPayment();
   }, [token]);
 
-  useEffect(() => {
-    async function checkUserModalities() {
-      try {
-        const response = await api.get('/enrollments', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const isRemoteResponse = await api.get(`/tickets/isremote?enrollmentId=${response.data.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (isRemoteResponse.data.isRemote === true) {
-          setIsRemote(true);
-        } else {
-          setIsRemote(false);
+  /*   useEffect(() => {
+      async function checkUserModalities() {
+        try {
+          const response = await api.get('/enrollments', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          const isRemoteResponse = await api.get(`/tickets/isremote?enrollmentId=${response.data.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          if (isRemoteResponse.data.isRemote === true) {
+            setIsRemote(true);
+          } else {
+            setIsRemote(false);
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
       }
-    }
-
-    checkUserModalities();
-  }, [token]);
+  
+      checkUserModalities();
+    }, [token]); */
 
   return (
     <>
@@ -77,7 +77,7 @@ export default function Activities() {
             </h1>
           </ErrorContainer>
         ) : (
-          <ActivityDay/> //componente que possui as atividades
+          <ActivityDay /> //componente que possui as atividades
         )
       ) : (
         <IsNotAvailable />

@@ -1,33 +1,58 @@
 import styled from 'styled-components';
 import { BiLogIn } from 'react-icons/bi';
 import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
+import api from '../../../services/api';
+import useToken from '../../../hooks/useToken';
 
 export default function ActivityDay() {
   const [selectActivityDay, setSelectActivityDay] = useState({
     isDaySelected: false,
-    dayId: 0,
+    day: 0,
   });
+  const [activities, setActivities] = useState([]);
+
   const MOCK_LIST_DAYS = [
     { id: 1, date: '2023-08-22' },
     { id: 2, date: '2023-08-23' },
     { id: 3, date: '2023-08-24' }
   ];
+
+  const token = useToken();
+
+  async function getActivities() {
+    try {
+      const loadedActivities = await api.get('/activities', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(loadedActivities.data);
+      setActivities(loadedActivities.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getActivities();
+  }, []);
+
   return (
     <ContainerActivities>
       <OptionsSection>
         {
-          selectActivityDay.isDaySelected?
-            '':
+          selectActivityDay.isDaySelected ?
+            '' :
             <h3>Primeiro, filtre pelo dia do evento: </h3>
         }
         <ButtonContainer>
           {
-            MOCK_LIST_DAYS.map(day => (
-              <button className={selectActivityDay.dayId===day.id?'selected_day':''} onClick={() => {setSelectActivityDay({ ...selectActivityDay, isDaySelected: true, dayId: day.id });}}>
-                {dayjs(day.date).locale('pt-br').format('dddd, DD/MM')}
+            activities.date?.map((d, i) => (
+              <button key={i} className={selectActivityDay.day === d.day ? 'selected_day' : ''} onClick={() => { setSelectActivityDay({ ...selectActivityDay, isDaySelected: true, day: d.day }); }}>
+                {dayjs(d.day).locale('pt-br').format('dddd, DD/MM').split('-feira')}
               </button>
             ))
           }
@@ -35,7 +60,7 @@ export default function ActivityDay() {
       </OptionsSection>
 
       {
-        selectActivityDay.isDaySelected?
+        selectActivityDay.isDaySelected ?
           <AtivitySection>
 
             <PlaceActivities>
@@ -47,7 +72,7 @@ export default function ActivityDay() {
                     <p>09:00 - 10:00</p>
                   </NameAndTimeContainer>
                   <IconConatiner>
-                    <BiLogIn/>
+                    <BiLogIn />
                     <p>27 vagas</p>
                   </IconConatiner>
                 </CardActivity>
@@ -58,7 +83,7 @@ export default function ActivityDay() {
                     <p>10:00 - 11:00</p>
                   </NameAndTimeContainer>
                   <IconConatiner className='sold_out'>
-                    <AiOutlineCloseCircle/>
+                    <AiOutlineCloseCircle />
                     <p>Esgotado</p>
                   </IconConatiner>
                 </CardActivity>
@@ -76,7 +101,7 @@ export default function ActivityDay() {
                   </NameAndTimeContainer>
 
                   <IconConatiner>
-                    <AiOutlineCheckCircle/>
+                    <AiOutlineCheckCircle />
                     <p>Inscrito</p>
                   </IconConatiner>
 
@@ -95,7 +120,7 @@ export default function ActivityDay() {
                   </NameAndTimeContainer>
 
                   <IconConatiner>
-                    <BiLogIn/>
+                    <BiLogIn />
                     <p>27 vagas</p>
                   </IconConatiner>
 
@@ -104,7 +129,7 @@ export default function ActivityDay() {
             </PlaceActivities>
 
           </AtivitySection>
-          :''
+          : ''
       }
     </ContainerActivities>
   );
@@ -158,13 +183,13 @@ const ButtonContainer = styled.div`
     border-radius: 4px;
     background: #E0E0E0;
     box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
-
     color: #000;
     text-align: center;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    cursor: pointer;
   }
 `;
 const AtivitySection = styled.section`
@@ -257,6 +282,7 @@ const IconConatiner = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   p{
     font-size: 9px;
     font-style: normal;

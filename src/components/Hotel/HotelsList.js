@@ -126,6 +126,7 @@ const SendBookingButton = styled.button`
   font-style: normal;
   font-weight: 400;
   margin-top: 46px;
+  cursor: pointer;
 `;
 
 const UpdateBookingButton = styled.button`
@@ -141,6 +142,7 @@ const UpdateBookingButton = styled.button`
   font-style: normal;
   font-weight: 400;
   margin-top: 46px;
+  cursor: pointer;
 `;
 
 const Subtitle = styled.h2`
