@@ -208,6 +208,7 @@ const CardToChoice = styled.div`
   display: flex;
   flex-direction: column;
   gap: 17px;
+  cursor: pointer;
   h3 {
     color: #8e8e8e;
     font-size: 20px;
