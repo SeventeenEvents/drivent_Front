@@ -83,10 +83,10 @@ export default function ActivityDay() {
                   <h3>{location}</h3>
                   <ActivitiesOnPlace>
                     {
-                      activities.activities?.map(function(activity) {
-                        if(activity.day === selectActivityDay.day && location === activity.location) {
-                          if(activity.vacancies>0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                      activities.activities?.map((activity) => {
+                        if (activity.day === selectActivityDay.day && location === activity.location) {
+                          if (activity.vacancies > 0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <VacancyActivity
                                 key={activity.id}
                                 name={activity.name}
@@ -97,8 +97,8 @@ export default function ActivityDay() {
                                 setReloadUseEffect={setReloadUseEffect}
                               />);
                           }
-                          if(activity.vacancies===0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                          if (activity.vacancies === 0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <NotVacancyActivity
                                 key={activity.id}
                                 name={activity.name}
@@ -106,8 +106,8 @@ export default function ActivityDay() {
                                 endAt={activity.endAt}
                               />);
                           }
-                          if(activity.vacancies>0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                          if (activity.vacancies > 0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <SubscribedActivity
                                 key={activity.id}
                                 name={activity.name}

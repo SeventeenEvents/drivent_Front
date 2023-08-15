@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import styled from 'styled-components';
 export default function SubscribedActivity({ name, startAt, endAt, }) {
-  return(
+  return (
     <CardActivity>
       <NameAndTimeContainer>
         <h3>{name}</h3>
@@ -35,16 +35,15 @@ const NameAndTimeContainer = styled.div`
     h3{
         width: 100%;
 
-        color: #343434;
+        color: #343434!important;
         text-align: left;
-        font-size: 12px;
-        font-style: normal;
+        font-size: 12px!important;
+        font-style: normal!important;;
         font-weight: 700;
         line-height: normal;
     }
     p{
         width: 100%;
-
         color: #343434;
         font-size: 12px;
         font-style: normal;

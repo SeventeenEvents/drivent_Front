@@ -5,7 +5,7 @@ import useToken from '../../../hooks/useToken';
 import api from '../../../services/api';
 import { toast } from 'react-toastify';
 
-export default function VacancyActivity({ name, startAt, endAt, vacancies, activityId, setReloadUseEffect }) {
+export default function VacancyActivity({ name, startAt, endAt, vacancies, activityId, setReloadUseEffect, duration }) {
   const token = useToken();
 
   async function reserveActivity() {
@@ -22,8 +22,8 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
       console.log(error);
     }
   }
-  return(
-    <CardActivity>
+  return (
+    <CardActivity duration={duration}>
       <NameAndTimeContainer>
         <h3>{name}</h3>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
@@ -38,7 +38,7 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
 const CardActivity = styled.div`
     border: transparent;
     width: 100%;
-    height: 79px;
+    height: ${(props) => (`${79 * props.duration}`)};
     padding: 10px;
     border-radius: 5px;
     background: #F1F1F1;
@@ -56,7 +56,7 @@ const NameAndTimeContainer = styled.div`
   h3{
     color: #343434;
     text-align: left;
-    font-size: 12px;
+    font-size: 12px!important;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
@@ -65,7 +65,7 @@ const NameAndTimeContainer = styled.div`
   p{
     width: 100%;
     color: #343434;
-    font-size: 12px;
+    font-size: 12px!important;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
