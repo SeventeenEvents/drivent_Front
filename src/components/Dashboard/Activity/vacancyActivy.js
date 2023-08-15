@@ -10,16 +10,15 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
 
   async function reserveActivity() {
     try {
-      const reserve = await api.post(`/activities/reserve/${activityId}`, {}, {
+      await api.post(`/activities/reserve/${activityId}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(reserve);
       toast.success('Inscrito na atividade com sucesso!');
       setReloadUseEffect([activityId]);
     } catch (error) {
-      console.log(error);
+      toast.error('Não foi possível reservar essa atividade!');
     }
   }
   return(
