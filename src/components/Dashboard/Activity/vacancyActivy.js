@@ -10,22 +10,21 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
 
   async function reserveActivity() {
     try {
-      const reserve = await api.post(`/activities/reserve/${activityId}`, {}, {
+      await api.post(`/activities/reserve/${activityId}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(reserve);
       toast.success('Inscrito na atividade com sucesso!');
       setReloadUseEffect([activityId]);
     } catch (error) {
-      console.log(error);
+      toast.error('Não foi possível reservar essa atividade!');
     }
   }
   return(
     <CardActivity>
       <NameAndTimeContainer>
-        <h3>{name}</h3>
+        <h2>{name}</h2>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
       </NameAndTimeContainer>
       <IconConatiner onClick={reserveActivity}>
@@ -53,7 +52,7 @@ const CardActivity = styled.div`
 const NameAndTimeContainer = styled.div`
   width: 100%;
   height: 100%;
-  h3{
+  h2{
     color: #343434;
     text-align: left;
     font-size: 12px;
