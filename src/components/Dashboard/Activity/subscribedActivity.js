@@ -5,7 +5,7 @@ export default function SubscribedActivity({ name, startAt, endAt, }) {
   return(
     <CardActivity>
       <NameAndTimeContainer>
-        <h3>{name}</h3>
+        <h2>{name}</h2>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
       </NameAndTimeContainer>
       <IconConatiner>
@@ -32,7 +32,7 @@ const CardActivity = styled.div`
 const NameAndTimeContainer = styled.div`
     width: 100%;
     height: 100%;
-    h3{
+    h2{
         width: 100%;
 
         color: #343434;
