@@ -1,6 +1,4 @@
 import styled from 'styled-components';
-import { BiLogIn } from 'react-icons/bi';
-import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
 import { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/pt-br';
@@ -9,6 +7,7 @@ import useToken from '../../../hooks/useToken';
 import VacancyActivity from './vacancyActivy';
 import NotVacancyActivity from './notVacancyActivy';
 import SubscribedActivity from './subscribedActivity';
+import { toast } from 'react-toastify';
 
 export default function ActivityDay() {
   const [selectActivityDay, setSelectActivityDay] = useState({
@@ -28,10 +27,9 @@ export default function ActivityDay() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(loadedActivities.data);
       setActivities(loadedActivities.data);
     } catch (error) {
-      console.log(error);
+      toast.error('Erro ao carregar atividades!');
     }
   }
   async function getReservedActivities() {
@@ -41,10 +39,9 @@ export default function ActivityDay() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(reservedActivities.data);
       setReserved(reservedActivities.data);
     } catch (error) {
-      console.log(error);
+      toast.error('Não conseguimos carregar suas atividades reservadas');
     }
   }
 
