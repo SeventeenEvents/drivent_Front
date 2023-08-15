@@ -1,8 +1,41 @@
 import useToken from '../../hooks/useToken';
 import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export default function BookingResume({ userBooking, setUpdateRoomStatus }) {
   const token = useToken();
+  const [roomBookings, setRoomBookings] = useState([]);
+
+  console.log(userBooking.Room.id);
+  console.log(`${process.env.REACT_APP_API_BASE_URL}/booking/room/${userBooking.Room.id}`);
+
+  useEffect(() => {
+    const headers = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    axios
+      .get(`${process.env.REACT_APP_API_BASE_URL}/booking/room/${userBooking.Room.id}`, headers)
+      .then((res) => {
+        setRoomBookings(res.data);
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
+  function returnRoomType(capacity) {
+    if (capacity === 1) return 'Single';
+    if (capacity === 2) return 'Double';
+    if (capacity === 3) return 'Triple';
+    if (capacity === 4) return 'Family';
+  }
+
+  function roommatesNumber(number) {
+    if (number === 1) return 'Você';
+    if (number > 1) return 'Você e mais ' + (number - 1);
+  }
 
   function loadResume() {
     if (userBooking.length === 0) {
@@ -13,11 +46,13 @@ export default function BookingResume({ userBooking, setUpdateRoomStatus }) {
           <img src={userBooking.Hotel.image} />
           <div>
             <h4>Quarto reservado:</h4>
-            <p>{userBooking.Room.name} (Single)</p>
+            <p>
+              {userBooking.Room.name} ({returnRoomType(userBooking.Room.capacity)})
+            </p>
           </div>
           <div>
             <h4>Pessoas no seu quarto:</h4>
-            <p>Você e mais 2</p>
+            <p>{roommatesNumber(roomBookings.length)}</p>
           </div>
         </CardContainer>
       );
@@ -86,6 +121,7 @@ const CardContainer = styled.div`
     font-family: Roboto;
     font-size: 12px;
     font-weight: 700;
+    margin-bottom: 2px;
   }
   p {
     color: #3c3c3c;

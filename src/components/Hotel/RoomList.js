@@ -17,11 +17,10 @@ export default function RoomList({ selectedHotel, selectedRoom, setSelectedRoom 
     const hotelWithRooms = axios
       .get(`${process.env.REACT_APP_API_BASE_URL}/hotels/${selectedHotel}`, headers)
       .then((res) => {
-        console.log(res);
         setRoomData(res.data.Rooms);
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [selectedHotel]);
 
   function toggleRoom(roomId) {
     if (roomId === selectedRoom) setSelectedRoom(null);
