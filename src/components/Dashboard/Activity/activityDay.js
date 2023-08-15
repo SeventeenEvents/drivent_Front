@@ -46,7 +46,7 @@ export default function ActivityDay() {
   }
 
   useEffect(() => {
-    if(reloadUseEffect === false) return;
+    if (reloadUseEffect === false) return;
     getActivities();
     getReservedActivities();
     setReloadUseEffect(false);
@@ -82,36 +82,39 @@ export default function ActivityDay() {
                   <h3>{location}</h3>
                   <ActivitiesOnPlace>
                     {
-                      activities.activities?.map(function(activity) {
-                        if(activity.day === selectActivityDay.day && location === activity.location) {
-                          if(activity.vacancies>0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                      activities.activities?.map((activity) => {
+                        if (activity.day === selectActivityDay.day && location === activity.location) {
+                          if (activity.vacancies > 0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <VacancyActivity
                                 key={activity.id}
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                                 vacancies={activity.vacancies}
                                 activityId={activity.id}
                                 setReloadUseEffect={setReloadUseEffect}
                               />);
                           }
-                          if(activity.vacancies===0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                          if (activity.vacancies === 0 && !reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <NotVacancyActivity
                                 key={activity.id}
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                               />);
                           }
-                          if(activity.vacancies>0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
-                            return(
+                          if (activity.vacancies > 0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
+                            return (
                               <SubscribedActivity
                                 key={activity.id}
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                               />);
                           }
                         }
