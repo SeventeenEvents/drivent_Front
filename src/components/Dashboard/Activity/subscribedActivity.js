@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { AiOutlineCheckCircle } from 'react-icons/ai';
 import styled from 'styled-components';
-export default function SubscribedActivity({ name, startAt, endAt, }) {
+export default function SubscribedActivity({ name, startAt, endAt, duration }) {
   return (
-    <CardActivity>
+    <CardActivity cardHeight={duration}>
       <NameAndTimeContainer>
         <h3>{name}</h3>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
@@ -19,7 +19,7 @@ const CardActivity = styled.div`
     background-color: #D0FFDB;
 
     width: 100%;
-    height: 79px;
+    height: ${props => (props.cardHeight) * 79}px;
     padding: 10px;
     border-radius: 5px;
     color: #343434;
@@ -45,9 +45,9 @@ const NameAndTimeContainer = styled.div`
     p{
         width: 100%;
         color: #343434;
-        font-size: 12px;
-        font-style: normal;
-        font-weight: 400;
+        font-size: 12px!important;
+        font-style: normal!important;
+        font-weight: 400!important;
         line-height: normal;
     }
 `;

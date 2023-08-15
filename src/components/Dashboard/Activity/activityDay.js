@@ -9,6 +9,7 @@ import useToken from '../../../hooks/useToken';
 import VacancyActivity from './vacancyActivy';
 import NotVacancyActivity from './notVacancyActivy';
 import SubscribedActivity from './subscribedActivity';
+import { duration } from '@material-ui/core';
 
 export default function ActivityDay() {
   const [selectActivityDay, setSelectActivityDay] = useState({
@@ -92,6 +93,7 @@ export default function ActivityDay() {
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                                 vacancies={activity.vacancies}
                                 activityId={activity.id}
                                 setReloadUseEffect={setReloadUseEffect}
@@ -104,6 +106,7 @@ export default function ActivityDay() {
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                               />);
                           }
                           if (activity.vacancies > 0 && reserved[0].reservedActivitiesId?.includes(activity.id)) {
@@ -113,6 +116,7 @@ export default function ActivityDay() {
                                 name={activity.name}
                                 startAt={activity.startAt}
                                 endAt={activity.endAt}
+                                duration={activity.duration}
                               />);
                           }
                         }

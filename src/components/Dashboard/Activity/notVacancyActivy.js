@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import styled from 'styled-components';
-export default function NotVacancyActivity({ name, startAt, endAt, }) {
-  return(
-    <CardActivity>
+export default function NotVacancyActivity({ name, startAt, endAt, duration }) {
+  return (
+    <CardActivity cardHeight={duration}>
       <NameAndTimeContainer>
         <h3>{name}</h3>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
@@ -20,7 +20,7 @@ const CardActivity = styled.div`
   }
   
   width: 100%;
-  height: 79px;
+  height: ${props => (props.cardHeight) * 79}px;
   padding: 10px;
   border-radius: 5px;
   background: #F1F1F1;

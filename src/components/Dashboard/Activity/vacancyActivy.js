@@ -23,7 +23,7 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
     }
   }
   return (
-    <CardActivity duration={duration}>
+    <CardActivity cardHeight={duration}>
       <NameAndTimeContainer>
         <h3>{name}</h3>
         <p>{dayjs(startAt).format('HH:MM')} - {dayjs(endAt).format('HH:MM')}</p>
@@ -38,7 +38,7 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
 const CardActivity = styled.div`
     border: transparent;
     width: 100%;
-    height: ${(props) => (`${79 * props.duration}`)};
+    height: ${props => (props.cardHeight) * 79}px;
     padding: 10px;
     border-radius: 5px;
     background: #F1F1F1;
@@ -57,7 +57,7 @@ const NameAndTimeContainer = styled.div`
     color: #343434;
     text-align: left;
     font-size: 12px!important;
-    font-style: normal;
+    font-style: normal!important;
     font-weight: 700;
     line-height: normal;
     width: 100%;
@@ -66,7 +66,7 @@ const NameAndTimeContainer = styled.div`
     width: 100%;
     color: #343434;
     font-size: 12px!important;
-    font-style: normal;
+    font-style: normal!important;
     font-weight: 400;
     line-height: normal;
   }
