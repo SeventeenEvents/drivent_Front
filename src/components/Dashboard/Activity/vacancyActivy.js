@@ -17,7 +17,7 @@ export default function VacancyActivity({ name, startAt, endAt, vacancies, activ
       });
       console.log(reserve);
       toast.success('Inscrito na atividade com sucesso!');
-      setReloadUseEffect([activityId]);
+      setReloadUseEffect(true);
     } catch (error) {
       console.log(error);
     }

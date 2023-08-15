@@ -17,7 +17,7 @@ export default function ActivityDay() {
   });
   const [activities, setActivities] = useState([]);
   const [reserved, setReserved] = useState([]);
-  const [reloadUseEffect, setReloadUseEffect] = ([]);
+  const [reloadUseEffect, setReloadUseEffect] = useState(null);
 
   const token = useToken();
 
@@ -49,8 +49,10 @@ export default function ActivityDay() {
   }
 
   useEffect(() => {
+    if(reloadUseEffect === false) return;
     getActivities();
     getReservedActivities();
+    setReloadUseEffect(false);
   }, [reloadUseEffect]);
 
   return (
