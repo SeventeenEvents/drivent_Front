@@ -73,8 +73,6 @@ export default function HotelsList({ hotels }) {
       });
   }
 
-  console.log('Reservas: ' + userBooking.length + 'Atualizando reserva: ' + updateRoomStatus);
-
   return (
     <>
       {userBooking.length === 0 || updateRoomStatus ? (
